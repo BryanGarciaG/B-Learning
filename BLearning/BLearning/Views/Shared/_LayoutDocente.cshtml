@@ -1,0 +1,255 @@
+﻿@using BLearning.Models.Negocio
+@{
+    PersonaEntidad objPersona = (PersonaEntidad)Session["personaLogin"];
+    
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - BLearning</title>
+
+    <!-- PACE LOAD BAR PLUGIN - This creates the subtle load bar effect at the top of the page. -->
+   
+
+    <!-- GLOBAL STYLES - Include these on every page. -->
+    @Styles.Render("~/Content/plugins/bootstrap/css/bootstrap.min.css")
+    @Styles.Render("http://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700,300italic,400italic,500italic,700italic")
+    @Styles.Render("http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800")
+    @Styles.Render("~/icons/font-awesome/css/font-awesome.min.css")
+
+    <!--ESTILOS DEL TEMA-->
+    @Styles.Render("~/Content/style.css")
+    @Styles.Render("~/Content/plugins.css")
+    <!-- THEME DEMO STYLES - Use these styles for reference if needed. Otherwise they can be deleted. -->
+    @Styles.Render("~/Content/demo.css")
+    @Scripts.Render("~/Scripts/jquery.js")
+
+    <!--SweetAlert-->
+    <script src="http://tristanedwards.me/u/SweetAlert//lib/sweet-alert.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://tristanedwards.me/u/SweetAlert//lib/sweet-alert.css">
+
+    <!-- PAGE LEVEL PLUGIN STYLES -->
+    @Styles.Render("~/Content/plugins/bootstrap-timepicker/bootstrap-timepicker.min.css")
+    @Styles.Render("http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css")
+    @Styles.Render("~/Content/plugins/bootstrap-datepicker/datepicker3.css")
+    @Styles.Render("~/Content/plugins/messenger/messenger.css")
+    @Styles.Render("~/Content/plugins/messenger/messenger-theme-flat.css")
+
+</head>
+<body>
+
+    <div id="wrapper">
+
+        <!-- begin TOP NAVIGATION -->
+        <nav class="navbar-top" role="navigation">
+
+            <!-- begin BRAND HEADING -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle pull-right" data-toggle="collapse" data-target=".sidebar-collapse">
+                    <i class="fa fa-bars"></i> Menu
+                </button>
+                <div class="navbar-brand" style="padding-top:0px">
+                    <a href="@Url.Action("Inicio", "Docente",new {@area = ""})">
+                        <img class="img-responsive" src="../img/logo-bl.png" alt="">
+                    </a>
+                </div>
+            </div>
+            <!-- end BRAND HEADING -->
+
+            <div class="nav-top">
+
+                <!-- begin LEFT SIDE WIDGETS -->
+                <ul class="nav navbar-left">
+                    <li class="tooltip-sidebar-toggle">
+                        <a href="#" id="sidebar-toggle" data-toggle="tooltip" data-placement="right" title="Sidebar Toggle">
+                            <i class="fa fa-bars"></i>
+                        </a>
+                    </li>
+                    <!-- You may add more widgets here using <li> -->
+                </ul>
+                <!-- end LEFT SIDE WIDGETS -->
+                <!-- begin MESSAGES/ALERTS/TASKS/USER ACTIONS DROPDOWNS -->
+                <ul class="nav navbar-right">
+
+                  
+                    <!-- begin USER ACTIONS DROPDOWN -->
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-user"></i>  <i class="fa fa-caret-down"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li>
+                                <a href="@Url.Action("Manual", "Docente",new {@area = ""})">
+                                    <i class="fa fa-question-circle fa-lg"></i> Help
+                                </a>
+                            </li>
+                            <li>
+                                <a class="logout_open" href="@Url.Action("logOut", "Login",new {@area = ""})">
+                                    <i class="fa fa-sign-out fa-lg"></i> Logout
+                                    <strong>@objPersona.nombres</strong>
+                                    <input id="idPersonaDocente" type="hidden" value="@objPersona.idPersona" />
+                                    <input id="nombrePersonaLog" type="hidden" value="@objPersona.apellidos @objPersona.nombres" />
+
+                                </a>
+                            </li>
+                        </ul>
+                        <!-- /.dropdown-menu -->
+                    </li>
+                    <!-- /.dropdown -->
+                    <!-- end USER ACTIONS DROPDOWN -->
+
+                </ul>
+                <!-- /.nav -->
+                <!-- end MESSAGES/ALERTS/TASKS/USER ACTIONS DROPDOWNS -->
+
+            </div>
+            <!-- /.nav-top -->
+        </nav>
+        <!-- /.navbar-top -->
+        <!-- end TOP NAVIGATION -->
+        <!-- begin SIDE NAVIGATION -->
+        <nav class="navbar-side" role="navigation">
+            <div class="navbar-collapse sidebar-collapse collapse">
+                <ul id="side" class="nav navbar-nav side-nav">
+                    <!-- begin SIDE NAV USER PANEL -->
+                    <li class="side-user hidden-xs">
+                        <img class="img-circle" src="../img/admin.jpg" alt="">
+                        <p class="welcome">
+                            <i class="fa fa-key"></i> Logged in as
+                        </p>
+                        <p class="name tooltip-sidebar-logout">
+                            @objPersona.nombres
+                            <span class="last-name"> @objPersona.apellidos </span> <a style="color: inherit" class="logout_open" href="@Url.Action("logOut", "Login", new { @area = ""})" data-toggle="tooltip" data-placement="top" title="Logout"><i class="fa fa-sign-out"></i></a>
+                        </p>
+                        <div class="clearfix"></div>
+                    </li>
+                    <!-- end SIDE NAV USER PANEL -->
+                    <!-- begin INICIO LINK -->
+                    <li class="panel">
+                        <a href="@Url.Action("Inicio", "Docente",new {@area = ""})">
+                            <i class="fa fa-home fa-lg"></i> Home
+                        </a>
+                    </li>
+                    <!-- end INICIO LINK -->
+                    <!-- begin Mis Actividades DROPDOWN -->
+                    <li class="panel">
+                        <a href="javascript:;" data-parent="#side" data-toggle="collapse" class="accordion-toggle" data-target="#charts">
+                            <i class="fa fa-book fa-lg"></i> Activities <i class="fa fa-caret-down"></i>
+                        </a>
+                        <ul class="collapse nav" id="charts">
+                            <li>
+                                <a href="@Url.Action("crearPreguntas", "Docente", new { @area = "" })">
+                                    <i class="fa fa-angle-double-right"></i> New activity
+                                </a>
+                                <a href="@Url.Action("verActividadesDocente", "Docente", new { @area = "" })">
+                                    <i class="fa fa-angle-double-right"></i> View activities
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- end Mis Actividades DROPDOWN -->
+                    <!-- begin Mis Cursos DROPDOWN -->
+                    <li class="panel">
+                        @Html.Partial("CursosDocentePartial")
+                    </li>
+                    <!-- end Mis Cursos DROPDOWN -->
+                   
+                    <!-- begin Estadisticas DROPDOWN -->
+                    <li class="panel">
+                        <a href="@Url.Action("Ver", "Reportes",new {@area = ""})">
+                            <i class="fa fa-bar-chart-o fa-lg"></i> Statistics
+                        </a>
+                    </li>
+                    <!-- end Mis Actividades DROPDOWN -->
+                    <!-- begin Estadisticas DROPDOWN -->
+                    <li >
+                        <a href="@Url.Action("creditos", "Reportes", new {@area ="", currentContro = "Docente" })">
+                            <i class="fa fa-info-circle fa-lg"></i> Credits
+                        </a>
+                    </li>
+                    <!-- end Mis Actividades DROPDOWN -->
+                    <!-- end PAGES DROPDOWN -->
+                </ul>
+                <!-- /.side-nav -->
+            </div>
+            <!-- /.navbar-collapse -->
+        </nav>
+        <!-- /.navbar-side -->
+        <!-- end SIDE NAVIGATION -->
+        <!-- begin MAIN PAGE CONTENT -->
+        <!-- /#page-wrapper -->
+        <!-- end MAIN PAGE CONTENT -->
+        <div id="page-wrapper">
+
+            <div class="page-content">
+
+                <!-- begin PAGE TITLE AREA -->
+                <!-- Use this section for each page's title and breadcrumb layout. In this example a date range picker is included within the breadcrumb. -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        @RenderBody()
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /#wrapper -->
+        <!-- GLOBAL SCRIPTS -->
+        @Scripts.Render("~/Scripts/plugins/bootstrap/bootstrap.min.js")
+@Scripts.Render("~/Scripts/plugins/slimscroll/jquery.slimscroll.min.js")
+@Scripts.Render("~/Scripts/plugins/popupoverlay/jquery.popupoverlay.js")
+@Scripts.Render("~/Scripts/plugins/popupoverlay/defaults.js")
+
+        <!-- Logout Notification Box -->
+        <div id="logout">
+            <div class="logout-message">
+                <br />
+                <h3>
+                    <i class="fa fa-sign-out text-orange"></i> Ready to go?
+                </h3>
+                <p>Select "Logout" below if you are ready<br> to end your current session.</p>
+                <ul class="list-inline">
+                    <li>
+                        <a href="@Url.Action("logOut", "Login",new{@area = ""})" class="btn btn-orange">
+                            <strong>Logout</strong>
+                        </a>
+                    </li>
+                    <li>
+                        <button class="logout_close btn btn-orange"><strong>Cancel</strong></button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- /#logout -->
+        <!-- Logout Notification jQuery -->
+        @Scripts.Render("~/Scripts/plugins/popupoverlay/logout.js")
+        <!-- HISRC Retina Images -->
+        @Scripts.Render("~/Scripts/plugins/hisrc/hisrc.js")
+        <!-- PAGE LEVEL PLUGIN SCRIPTS -->
+        @Scripts.Render("~/Scripts/plugins/messenger/messenger.min.js")
+        @Scripts.Render("~/Scripts/plugins/messenger/messenger-theme-flat.js")
+        <!-- PAGE LEVEL PLUGIN SCRIPTS -->
+        
+        @Scripts.Render("~/Scripts/plugins/bootstrap-maxlength/bootstrap-maxlength.js")
+        @Scripts.Render("~/Scripts/plugins/bootstrap-timepicker/bootstrap-timepicker.min.js")
+        @Scripts.Render("~/Scripts/plugins/bootstrap-datepicker/bootstrap-datepicker.js")
+
+        <!-- THEME SCRIPTS -->
+        @Scripts.Render("~/Scripts/flex.js")
+        @Scripts.Render("~/Scripts/notifications-demo.js")
+        <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+
+    </div>
+    <div id="footer" style="background-color: #2c3e50">
+        <p>
+            <img style="width:21px; " src="">&nbsp;© 2017 Unidad de Producción de Software - UPS. &nbsp;B-learning
+        </p>
+    </div>
+</body>
+</html>
+
+

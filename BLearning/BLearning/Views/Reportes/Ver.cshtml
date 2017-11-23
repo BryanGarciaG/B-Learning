@@ -1,0 +1,816 @@
+﻿
+
+@using BLearning.Models.Negocio;
+
+@{
+    ViewBag.Title = "Statistics";
+    Layout = "~/Views/Shared/_LayoutDocente.cshtml";
+    List<DocenteCursosEntidad> cursos = (List<DocenteCursosEntidad>)Session["cursos"];
+}
+
+@Styles.Render("~/Content/plugins/chart/horizBarChart.css")
+@Styles.Render("~/Content/plugins/morris/morris.css")
+
+    <div class="col-lg-12">
+        <div class="page-title">
+            <h1>
+                Students - Statistics
+            </h1>
+            <ol class="breadcrumb">
+                <li>
+                    <i class="fa fa-bar-chart-o active"></i><a href="#" onclick="return false;"> Statistics</a>
+                </li>
+            </ol>
+
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class="row">
+            <div class=" col-sm-9">
+                <select id="selectModulo" class=" form-control">
+                    <option value="0" selected>Select...</option>
+                    @foreach (var item in cursos)
+                {
+                    string modulo = item.numNivel + item.numParalelo;
+                        <option value="@item.idModulo" id="@item.idModulo" data-nivel="@item.idNivel">@modulo</option>
+                }
+                </select>
+
+            </div>
+            <div class=" col-sm-3">
+                <button onclick="crearTabla(); return false;" class=" btn btn-orange form-control">Consult</button>
+            </div>
+        </div>
+        <br />
+    </div>
+    <div class="col-lg-12">
+        <div class=" row">
+            <div class="col-sm-offset-9 col-sm-3">
+                <button id="botonPDF" onclick="imprimir(); return false;" style="display:none" class=" btn btn-red form-control">Export to PDF</button>
+            </div>
+        </div>
+        <br />
+    </div>
+<div id="">
+    <div class="col-lg-12">
+        <div class="portlet portlet-default">
+            <div class="portlet-heading">
+                <div class="portlet-title">
+                    <h4>Assigned activities</h4>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="portlet-body">
+                <div class="table-responsive" style="text-align:center">
+                    <table id="tablaActividades" class="table table-bordered table-condensed">
+                        <thead id="tHeadtablaActividades">
+                        </thead>
+                        <tbody id="tBodyTablaActividades"></tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- /.portlet-body -->
+        </div>
+        <!-- /.portlet -->
+
+    </div>
+    <div class="col-lg-12">
+        <div class="portlet portlet-default">
+            <div class="portlet-heading">
+                <div class="portlet-title">
+                    <h4>Detail of student performance</h4>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="portlet-body">
+                <ul id="myTab" class="nav nav-tabs">
+                    <li class="active" onclick=" return false;">
+                        <a href="#calificaciones" data-toggle="tab">Scores</a>
+                    </li>
+                    <li onclick=" return false;">
+                        <a href="#tiempo" data-toggle="tab"> Time worked</a>
+                    </li>
+                </ul>
+                <div id="myTabContent" class="tab-content">
+                    <div class="tab-pane fade in active" id="calificaciones" style="text-align:center">
+                        <div class="table-responsive">
+                            <table id="tablaPormedios" class="table table-bordered table-hover table-condensed">
+                                <thead id="tHeadtablaProme">
+                                </thead>
+                                <tbody id="tBodyTablaProme"></tbody>
+                            </table>
+                        </div>
+
+                    </div>
+
+                    <div class="tab-pane fade" id="tiempo">
+                        <div id="chart-horizontal" class="panel-collapse collapse in">
+                            <div class="portlet-body">
+                                <!--aqui va char de tiemopo horizontal-->
+                                <br />
+                                <div id="chart-horizTiempo" class="chart-horiz">
+                                    @*Actual bar chart*@
+                                    <ul class="chart"></ul>
+                                </div>
+                                @*<div class="row">
+                                        <div class="col-sm-10 col-sm-offset-1 " style="text-align:center">
+
+                                            <div id="barChartHorizontalT">
+                                                <div class="portlet-body">
+                                                    <div id="chart-bar-Hori-Tiempo" style="position: relative;">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>*@
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- /.portlet-body -->
+        </div>
+        <!-- /.portlet -->
+
+    </div>
+    <div class=" col-lg-6">
+        <div class="portlet portlet-default">
+            <div class="portlet-heading">
+                <div class="portlet-title">
+                    <h4>Average effectiveness for skills</h4>
+                </div>
+
+                <div class="clearfix"></div>
+            </div>
+            <div id="efectiviChart" class="panel-collapse collapse in">
+                <div class="portlet-body">
+
+                    <div class="row">
+                        <div class="col-sm-10 col-sm-offset-1 " style="text-align:center">
+
+                            <div id="barChart">
+                                <div class="portlet-body">
+                                    <div id="chart-bar" style="position: relative;">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+    <div class="col-lg-6">
+        <div class=" portlet portlet-default">
+            <div class="portlet-heading">
+                <div class="portlet-title">
+                    <h4>Quality</h4>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="portlet-body">
+                <div class="row">
+                    <div class=" col-md-8">
+                        <div class="portlet-body">
+                            <div id="morris-chart-donut"></div>
+                        </div>
+                    </div>
+                    <div id="tagsModulo" class=" col-md-4" style="display:none">
+                        <br />
+                        <br />
+                        <br />
+                        <ul id="tagsPastel">
+                            <li>
+                                <svg height="3mm" width="3mm">
+                                    <rect width="3mm" height="3mm" style="fill: #92d050;"></rect>
+                                </svg>&nbsp
+                                <a id="Excellent" href="#" onclick="modalCali(this);return false;">Excellent</a>
+                            </li>
+                            <li>
+                                <svg height="3mm" width="3mm">
+                                    <rect width="3mm" height="3mm" style="fill: #46b8e9;"></rect>
+                                </svg>&nbsp
+                                <a id="Verygood" href="#" onclick="modalCali(this); return false;">Very good</a>
+                            </li>
+                            <li>
+                                <svg height="3mm" width="3mm">
+                                    <rect width="3mm" height="3mm" style="fill: #ffff00;;"></rect>
+                                </svg>&nbsp
+                                <a id="Good" href="#" onclick="modalCali(this); return false;">Good</a>
+                            </li>
+                            <li>
+                                <svg height="3mm" width="3mm">
+                                    <rect width="3mm" height="3mm" style="fill: #f79646;"></rect>
+                                </svg>&nbsp
+                                <a id="Regular" href="#" onclick="modalCali(this); return false;">Regular</a>
+                            </li>
+                            <li>
+                                <svg height="3mm" width="3mm">
+                                    <rect width="3mm" height="3mm" style="fill: #ff0000;"></rect>
+                                </svg>&nbsp
+                                <a id="Deficient" href="#" onclick="modalCali(this); return false;">Deficient</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalGif" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:60%" role="document">
+        <div id="contenedor">
+            <div class="loader" id="loader">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade charts-modal" id="efectPorEstudiante" tabindex="-1" role="dialog" aria-labelledby="labelModal" aria-hidden="true">
+    <div class="modal-dialog" style="width:60%" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-darrk-blue-o">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="labelModal">Effectiveness</h4>
+            </div>
+            <div class="modal-body">
+                <div class=" row">
+                    <div id="barEfectividad">
+                        <div class=" col-lg-10 col-lg-offset-1">
+                            <div id="chart-barEfectividadUnitaria" style="position: relative; width:auto">
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div style="display:none" class="container" id="page2PDF">
+    <!--Cabecera del pdf Imagenes-->
+    <table style="text-align:center" width="100%">
+        <tr>
+            <td><img height="100px" width="200px" src="../Img/espamLogo.png" /></td>
+            <td><img height="100px" width="200px" src="../Img/logoCI.jpg" /></td>
+        </tr>
+    </table>
+    <br />
+
+    <!--titulo del pdf-->
+    <table width="100%">
+        <tr style="text-align:center">
+            <td colspan="3"><h2>STATISTICS OF THE MODULE C@(ViewData["CicloActual"]) <span class="moduloRemplaza">M102</span></h2></td>
+        </tr>
+        <tr>
+            <td width="60%">
+                <b style="padding-right:5px">TEACHER: </b>
+                <script>document.write($("#nombrePersonaLog").val());</script>
+            </td>
+            <td width="20%">
+                <b style="padding-right:5px">CICLE: </b>C@(ViewData["CicloActual"])
+            </td>
+            <td width="20%">
+                <!--aqui pasar el modulo del curso seleccionado-->
+                <b style="padding-right:5px">COURSE: </b><span class="moduloRemplaza">M102</span>
+            </td>
+        </tr>
+    </table>
+    <br />
+
+    
+    <!--contenido-->
+    <!--tabla Assigned activities-->
+    <table width="100%">
+        <tr>
+            <td style="padding:5px; text-align:center"><h3>Assigned activities</h3></td>
+        </tr>
+    </table>
+    <table border="1" width="100%">
+        <thead id="tHeadCanActiAsig">
+            
+
+        </thead>
+        <tbody id="tBodyCanActiAsig">
+
+        </tbody>
+    </table>
+    <br />
+
+    <!--tabla Scores-->
+    <table width="100%">
+        <tr>
+            <td style="padding:5px; text-align:center"><h3>Scores</h3></td>
+        </tr>
+    </table>
+    <table border="1" width="100%">
+        <thead id="tHeadtablaPromePDF">
+
+        </thead>
+        <tbody id="tBodyTablaPromePDF"></tbody>
+    </table>
+
+    <br />
+
+    <!--tabla Time Worked for skills chart-->
+    <table width="100%">
+        <tr>
+            <td style="padding:5px; text-align:center"><h3>Time Worked</h3></td>
+        </tr>
+    </table>
+    <table border="1" width="100%">
+        <thead id="tHeadTiempoPDF">
+            <tr>
+                <th width="10%" style="padding:5px; text-align:center">#</th>
+                <th width="75%" style="padding:5px; text-align:left">Names</th>
+                <th width="15%" style="padding:5px; text-align:center">Time Worked</th>
+            </tr>
+        </thead>
+        <tbody id="tBodyTiempoPDF">
+            <tr>
+                <td style="text-align: center; padding: 5px;"><h5>No datas</h5></td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+
+    <!--tabla Quality chart-->
+    <table width="100%">
+        <tr>
+            <td style="padding:5px; text-align:center"><h3>Quality</h3></td>
+        </tr>
+    </table>
+    <table border="1" width="100%">
+        <tbody>
+            <tr>
+                <td style="text-align: center; border-right: 0px;" id="chartPastelPDF">
+                </td>
+                <td style="text-align: left; border-left: 0px; " id="tagsPastelPDF"></td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+
+    <!--tabla Average effectiveness for skills chart-->
+    <table width="100%">
+        <tr>
+            <td style="padding:5px; text-align:center"><h3>Average effectiveness for skills</h3></td>
+        </tr>
+    </table>
+    <table border="1" width="100%">
+        
+        <tbody>
+            <tr>
+                <td style="text-align: center; border-right: 0px;" id="chartSkillsPDF"></td>
+                
+            </tr>
+        </tbody>
+    </table>
+    <br />
+
+    
+</div>
+
+@Scripts.Render("~/Scripts/plugins/morris/raphael-2.1.0.min.js")
+@Scripts.Render("~/Scripts/plugins/morris/morris.js")
+@Scripts.Render("~/Scripts/redondearDecimales.js")
+@Scripts.Render("~/Scripts/plugins/horizBarChart.js")
+@Scripts.Render("~/Scripts/estado-calificacion.js")
+
+
+
+<script>
+    $(document).ajaxStart(function () {
+        $("#modalGif").modal('show');
+    });
+    $(document).ajaxStop(function () {
+        $("#modalGif").modal('hide');
+        //$('body').removeClass('modal-open');
+        //$('.modal-backdrop').remove();
+    });
+
+
+    var arrayCantiEstu = [];
+
+    function traerDatosPastel() {
+        arrayCantiEstu.length = 0;
+        var idModulo = $("#selectModulo").val();
+        var arrayPosiciones = [];
+        if (idModulo == '0') {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-top messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'You have not selected any module',
+                type: 'error',
+                hideAfter: 5,
+                showCloseButton: false
+            });
+            return false;
+        }
+        $.ajax({
+            url: "../Reportes/posicionesXmodulo",
+            type: "POST",
+            data: JSON.stringify({ _idModulo: idModulo }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (result) {
+                var excelente = 0; var mBueno = 0; var bueno = 0; var regular = 0; var malo = 0;
+                var objEstuCali = {};
+                var estadoCalificacion = "";
+                for (var i = 0; i < result.length; i++) {
+                    estadoCalificacion = consultarEstadoCalificacion(result[i].promedio);
+                    if (estadoCalificacion == "Excellent") {
+                        excelente++;
+                        objEstuCali = { "label": "Excellent", "nombre": result[i].nombres, "promedio": result[i].promedio };
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                    if (estadoCalificacion == "Very Good") {
+                        mBueno++;
+                        objEstuCali = { "label": "Very Good", "nombre": result[i].nombres, "promedio": result[i].promedio };
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                    if (estadoCalificacion == "Good") {
+                        bueno++;
+                        objEstuCali = { "label": "Good", "nombre": result[i].nombres, "promedio": result[i].promedio };
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                    if (estadoCalificacion == "Regular") {
+                        regular++;
+                        objEstuCali = { "label": "Regular", "nombre": result[i].nombres, "promedio": result[i].promedio };
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                    if (estadoCalificacion == "Deficient") {
+                        malo++;
+                        objEstuCali = { "label": "Deficient", "nombre": result[i].nombres, "promedio": result[i].promedio };
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                }
+                arrayPosiciones[0] = { "label": "Excellent", "value": excelente };
+                arrayPosiciones[1] = { "label": "Very Good", "value": mBueno };
+                arrayPosiciones[2] = { "label": "Good", "value": bueno };
+                arrayPosiciones[3] = { "label": "Regular", "value": regular };
+                arrayPosiciones[4] = { "label": "Deficient", "value": malo };
+
+                pastel(arrayPosiciones);
+
+                $("#tagsModulo").show();
+                $("#tagsModulo").find("#Excellent").html("Excellent: " + excelente);
+                $("#tagsModulo").find("#Verygood").html("Very Good: " + mBueno);
+                $("#tagsModulo").find("#Good").html("Good: " + bueno);
+                $("#tagsModulo").find("#Regular").html("Regular: " + regular);
+                $("#tagsModulo").find("#Deficient").html("Deficient: " + malo);
+
+            }
+        });
+        verEfectividad();
+    }
+    function pastel(arrayPosiciones) {
+        $("#morris-chart-donut").html("");
+
+        var morris = Morris.Donut({
+            element: 'morris-chart-donut',
+            data: arrayPosiciones,
+            resize: true,
+            colors: ["#92d050", "#46b8e9", "#ffff00", "#f79646", "#ff0000"],
+        });
+        
+    }
+
+    function crearTabla() {
+        var idModulo = $("#selectModulo").val();
+        if (idModulo == '0') {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-top messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'You have not selected any module',
+                type: 'error',
+                hideAfter: 1,
+                showCloseButton: false
+            });
+            $('#botonPDF').css('display', 'none');
+            return false;
+        }
+        $.ajax({
+            url: "../Reportes/promediosXModulo",
+            type: "POST",
+            data: JSON.stringify({ _idModulo: idModulo }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (data) {
+                $("#tBodyTablaProme").html("");
+                $("#tBodyTablaPromePDF").html("");
+                if (data.lecciones.length == 0) {
+                    $("#tHeadtablaProme").html('<tr><th>There is not activities asigned in this modul.</th></tr>');
+                    $("#tHeadtablaPromePDF").html('<tr><th style="padding: 5px; text-align:center;">There is not activities asigned in this modul.</th></tr>');
+                }
+                else {
+                    var result = data.listARE;
+                    var listaLecciones = "";
+                    var listaLeccionesPDF = "";
+                    for (var i = 0; i < data.lecciones.length; i++) {
+                        listaLecciones = listaLecciones + "<th>" + data.lecciones[i].numLeccion + "</th>";
+                        listaLeccionesPDF = listaLeccionesPDF + "<th style='text-align: center;padding: 5px;' >" + data.lecciones[i].numLeccion + "</th>";
+                    }
+                    $("#tHeadtablaProme").html('<tr><th rowspan="2">#</th><th rowspan="2">Names</th><th rowspan="2">Resolved Activities</th><th colspan="' + result[0].objProLecc.length + '" style="text-align: right">Lessons</th><th rowspan="2">Total</th><th rowspan="2">State</th><th rowspan="2">Effectiveness</th></tr><tr>' + listaLecciones + '</tr>');
+                    $("#tHeadtablaPromePDF").html('<tr><th style="padding: 5px; text-align:center;" rowspan="2">#</th><th style="padding: 5px;" rowspan="2">Names</th><th style="padding: 5px;" rowspan="2">Resolved Activities</th><th colspan="' + result[0].objProLecc.length + '" style="text-align: center;padding: 5px;">Lessons</th><th  style="padding: 5px;" rowspan="2">Total</th><th  style="padding: 5px;" rowspan="2">State</th></tr><tr>' + listaLeccionesPDF + '</tr>');
+                    var cont = 0;
+                    for (var i = 0; i < result.length; i++) {
+                        cont = cont + 1;
+                        $("#tBodyTablaProme").append('<tr id="alum' + result[i].idAlumno + '"></tr>');
+
+                        $("#tBodyTablaPromePDF").append('<tr id="alumPDF' + result[i].idAlumno + '"></tr>');
+
+                        $('#alum' + result[i].idAlumno).append('<td style="text-align:right">' + cont + '</td>');
+                        $('#alum' + result[i].idAlumno).append('<td style="text-align:left">' + result[i].nombres + '</td>');
+                        $('#alum' + result[i].idAlumno).append('<td>' + result[i].cantidadActiResu + '</td>');
+
+                        $('#alumPDF' + result[i].idAlumno).append('<td style="text-align:right;padding: 5px;">' + cont + '</td>');
+                        $('#alumPDF' + result[i].idAlumno).append('<td style="text-align:left;padding: 5px;">' + result[i].nombres + '</td>');
+                        $('#alumPDF' + result[i].idAlumno).append('<td style="text-align:center;padding: 5px;">' + result[i].cantidadActiResu + '</td>');
+                        var prom = 0;
+                        var estadoCalificacion = "";
+                        for (var j = 0; j < result[i].objProLecc.length; j++) {
+                            prom = prom + result[i].objProLecc[j].valor;
+                            $('#alum' + result[i].idAlumno).append('<td style="text-align: right">' + result[i].objProLecc[j].valor + '</td>');
+                            $('#alumPDF' + result[i].idAlumno).append('<td style="text-align: right;padding: 5px;">' + result[i].objProLecc[j].valor + '</td>');
+                        }
+                        $('#alum' + result[i].idAlumno).append('<td style="text-align: right">' + redondeaDecimales(prom / result[i].objProLecc.length, 2) + '</td>');
+                        $('#alumPDF' + result[i].idAlumno).append('<td style="text-align: right;padding: 5px;">' + redondeaDecimales(prom / result[i].objProLecc.length, 2) + '</td>');
+                        estadoCalificacion = consultarEstadoCalificacion(redondeaDecimales(prom / result[i].objProLecc.length, 2));
+                        $('#alum' + result[i].idAlumno).append('<td>' + estadoCalificacion + '</td>');
+                        $('#alumPDF' + result[i].idAlumno).append('<td style="text-align: right;padding: 5px;">' + estadoCalificacion + '</td>');
+                        if (prom != 0) {
+                            $('#alum' + result[i].idAlumno).append('<td><a href="#" class="btn btn-orange btn-xs" onclick="efectividad(' + result[i].idAlumno + '); return false;">View</a></td>');
+                        } else {
+                            $('#alum' + result[i].idAlumno).append('<td><a class="btn btn-orange btn-xs disabled">View</a></td>');
+                        }
+
+                    }
+                }
+            }
+        });
+        traerDatosPastel();
+    }
+
+    function modalCali(me) {
+        var posicion = me.id;
+        $("#tBodyCalificaciones").html("");
+        for (var i = 0; i < arrayCantiEstu.length; i++) {
+            if (posicion == arrayCantiEstu[i].label) {
+                $("#tBodyCalificaciones").append('<tr><td>' + arrayCantiEstu[i].nombre + '</td><td>' + arrayCantiEstu[i].promedio + '</td></tr>');
+            }
+        }
+        $("#modalAsignar").modal("show");
+    }
+
+    function efectividad(idEstud) {
+        var idMod = $("#selectModulo").val();
+
+        $.ajax({
+            url: "../Reportes/efectividad",
+            type: "POST",
+            data: JSON.stringify({ idEstudiante: idEstud, idModulo: idMod }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (result) {
+                $("#chart-barEfectividadUnitaria").html("");
+                efectividadUnitaria(result);
+            }
+        });
+    }
+
+    function efectividadUnitaria(result) {
+        $("#chart-barEfectividadUnitaria").html("");
+        if (result.data.length != 0) {
+            var MorrisBar = Morris.Bar({
+                element: 'chart-barEfectividadUnitaria',
+                data: result.data,
+                xkey: 'tipoEfectividad',
+                ykeys: ['porcentaje'],
+                postUnits: '%',
+                labels: ['Percent'],
+                hideHover: 'auto',
+                goals: [100],
+                resize: true,
+                xLabelFormat: function (d) {
+                    return d.src.tipoEfectividad;
+                },
+                barColors: ["#3ee9d1"],
+                hoverCallback: function (index, options, content, row) {
+                    return content;
+                }
+            });
+        }
+        $("#efectPorEstudiante").modal("show");
+    }
+
+    function verEfectividad() {
+        var idModulo = $("#selectModulo").val();
+
+        if (idModulo == '0') {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-top messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'You have not selected any module',
+                type: 'error',
+                hideAfter: 5,
+                showCloseButton: false
+            });
+            return false;
+        }
+        $.ajax({
+            url: "../Reportes/consultarEfectividaXmodulo",
+            type: "POST",
+            data: JSON.stringify({ idModulo: idModulo }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (result) {
+                $("#chart-bar").html("");
+                graficoEfectividad(result);
+            }
+        });
+        verTiempo();
+    }
+
+    function verTiempo() {
+        var idModulo = $("#selectModulo").val();
+        if (idModulo == '0') {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-top messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'You have not selected any module',
+                type: 'error',
+                hideAfter: 5,
+                showCloseButton: false
+            });
+            return false;
+        }
+        $.ajax({
+            url: "../Reportes/consultarTiempoXmodulo",
+            type: "POST",
+            data: JSON.stringify({ idModulo: idModulo }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (result) {
+                graficoTiempo(result);
+            }
+        });
+        verReporteActividades();
+    }
+
+    function graficoEfectividad(result) {
+        $("#chart-bar").html("");
+        if (result.data.length != 0) {
+            var MorrisBar = Morris.Bar({
+                element: 'chart-bar',
+                data: result.data,
+                xkey: 'tipoEfectividad',
+                ykeys: ['porcentaje'],
+                postUnits: '%',
+                labels: ['Percent'],
+                hideHover: 'auto',
+                goals: [100],
+                resize: true,
+                xLabelFormat: function (d) {
+                    return d.src.tipoEfectividad;
+                },
+                barColors: ["#3ee9d1"],
+                hoverCallback: function (index, options, content, row) {
+                    return content;
+                }
+            });
+           
+        } else {
+            $("#chart-bar").append("<h5>No datas</h5>");
+        }
+    }
+
+    function graficoTiempo(result) {
+        $('.chart').html("");
+        $('#tHeadTiempoPDF').html("");
+        if (result.tiempoParalelo.length != 0) {
+            $('#tHeadTiempoPDF').html('<tr><td width="10%" style="text-align: center; padding: 5px;">#</td><th width="75%" style="padding:5px; text-align:center">Names</th><th colspan="2" width="15%" style="padding:5px; text-align:center">Time worked</th></tr>'
+                + '<tr></tr>');
+
+            $(".chart").append("<li class='current' title='TIEMPO PROMEDIO DEL MÓDULO'><span class='bar' data-number='" + result.tt + "'></span><span class='number'>" + result.tts + "</span></li>");
+
+            $('#tBodyTiempoPDF').html("");
+            $.each(result.tiempoParalelo, function (index, value) {
+                $(".chart").append("<li class='past' title='" + value.label + "'><span class='bar' data-number='" + value.tiempo + "'></span><span class='number'>" + value.tiempoString + "</span></li>");
+
+                $("#tBodyTiempoPDF").append('<tr><td width="10%" style="text-align: center; padding: 5px;">' + (index + 1) + '</td><td width="75%" style="text-align: left; padding: 5px;">' + value.label + '</td>'
+                    + '<td width="15%" style="text-align: center; padding: 5px;">'+ value.tiempoString + '</td></tr>');
+            });
+            $("#tBodyTiempoPDF").append('<tr><th colspan="2" width="75%" style="padding:5px; text-align:right">AVERAGE TIME OF THE MODULE:</th><th width="25%" colspan="2" style="padding:5px; text-align:right"> ' + result.tts + '</th></tr>');
+        }
+        else {
+            $(".chart").append("<h5>No datas</h5>");
+            $('#tHeadTiempoPDF').html('<tr><th style="padding:5px; text-align:center">No datas</th></tr>');
+            $("#tBodyTiempoPDF").html('');
+        }
+
+        $('.chart').horizBarChart({
+            selector: '.bar',
+            speed: 1000
+        });
+    }
+
+    function verReporteActividades() {
+        var idModulo = $("#selectModulo").val();
+
+        $.ajax({
+            url: "../Reportes/reporteActividadLeccion",
+            type: "POST",
+            data: JSON.stringify({ idMod: idModulo }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (result) {
+                var listaLecciones = "";
+                var listaLecciones2PDF = "";
+                for (var i = 0; i < result[0]._objListaLeccionesAsignadas.length; i++) {
+                    listaLecciones = listaLecciones + "<th>" + result[0]._objListaLeccionesAsignadas[i].numLeccion + "</th>";
+                    listaLecciones2PDF = listaLecciones2PDF + "<th style='padding: 5px; text-align:center;'>" + result[0]._objListaLeccionesAsignadas[i].numLeccion + "</th>";
+                }
+                $("#tBodyTablaActividades").html("");
+                $("#tHeadtablaActividades").html('<tr><th style="text-align:center"  rowspan="2">Type of Activity</th><th colspan="' + result[0]._objListaLeccionesAsignadas.length + '" >Lessons</th><th rowspan="2">Total</th></tr><tr>' + listaLecciones + '</tr>');
+
+                //para crear tHead de la tabla PDF de actividades por leccion segun tipo de actividad
+                $("#tHeadCanActiAsig").html('<tr><th style="padding: 5px;" rowspan="2">Type of Activity</th><th style="padding: 5px; text-align:center;" colspan="' + result[0]._objListaLeccionesAsignadas.length + '" >Lessons</th>'
+                    + '<th style="padding: 5px; text-align:center;" rowspan="2">Total</th></tr><tr>' + listaLecciones2PDF + '</tr>');
+
+                $("#tBodyCanActiAsig").html("");
+
+                var cont = 0;
+                for (var i = 0; i < result.length; i++) {
+                    cont = cont + 1;
+                    $("#tBodyTablaActividades").append('<tr id="tipo' + i + '"></tr>');
+                    $("#tBodyCanActiAsig").append('<tr id="tipoPDF' + i + '"></tr>');
+
+
+                    $('#tipo' + i).append('<td style="text-align:left">' + result[i].tipoActividad + '</td>');
+                    $('#tipoPDF' + i).append('<td style="padding: 5px;text-align:left">' + result[i].tipoActividad + '</td>');
+
+                    var SUM = 0;
+                    var estadoCalificacion = "";
+                    for (var j = 0; j < result[i]._objListaLeccionesAsignadas.length; j++) {
+                        SUM = SUM + result[i]._objListaLeccionesAsignadas[j].valor;
+                        $('#tipo' + i).append('<td style="text-align: center">' + result[i]._objListaLeccionesAsignadas[j].valor + '</td>');
+                        $('#tipoPDF' + i).append('<td style="padding: 5px; text-align: center">' + result[i]._objListaLeccionesAsignadas[j].valor + '</td>');
+                    }
+                    $('#tipo' + i).append('<td style="text-align: right">' + SUM + '</td>');
+                    $('#tipoPDF' + i).append('<td style="padding: 5px; text-align: right">' + SUM + '</td>');
+
+                }
+            }
+        });
+        $('#botonPDF').css('display', 'block');
+    }
+
+    
+
+  
+
+    function copiarCharts()
+    {
+        $("#chartPastelPDF").html($("#morris-chart-donut").html());
+        $("#tagsPastelPDF").html($("#tagsModulo").html());
+        $("#chartSkillsPDF").html($("#chart-bar").html());
+    }
+
+    function imprimir() {
+        copiarCharts();
+        var str = $('#page2PDF').html();
+        // str = str + "" + $('#post').html();
+        //var win = window.open("", "");
+        var win = window;
+        win.document.close();
+        var antes = win.document.body.innerHTML;
+        win.document.body.innerHTML = str;
+        win.print(); // blocking - so close will not 
+        win.document.body.innerHTML = antes;
+        // win.close(); // execute until this is done
+
+    };
+</script>

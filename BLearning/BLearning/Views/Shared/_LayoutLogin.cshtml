@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Centro de Idiomas</title>
+    
+    <!-- GLOBAL STYLES - Include these on every page. -->
+    @Styles.Render("~/Content/bootstrap.min.css")
+    @Styles.Render("http://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700,300italic,400italic,500italic,700italic")
+    @Styles.Render("http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800")
+    @Styles.Render("~/fonts/font-awesome.min.css")
+    @Styles.Render("~/Content/plugins/bootstrap/css/bootstrap.min.css")
+
+    <!-- PAGE LEVEL PLUGIN STYLES -->
+    @Styles.Render("~/Content/demo.css")
+
+    @Styles.Render("~/Content/css")
+
+</head>
+
+<body >
+    @RenderBody()
+
+    <!-- GLOBAL SCRIPTS -->
+    @Scripts.Render("http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js")
+    @Scripts.Render("~/Scripts/plugins/bootstrap/bootstrap.min.js")
+    @Scripts.Render("~/Scripts/plugins/slimscroll/jquery.slimscroll.min.js")
+
+    <!-- HISRC Retina Images -->
+    @Scripts.Render("~/Scripts/plugins/hisrc/hisrc.js")
+
+    <!-- PAGE LEVEL PLUGIN SCRIPTS -->
+    <!-- THEME SCRIPTS -->
+    @Scripts.Render("~/Scripts/flex.js")
+
+</body>
+</html>

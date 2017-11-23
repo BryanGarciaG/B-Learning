@@ -1,0 +1,356 @@
+﻿@using BLearning.Models.Negocio
+@model BLearning.Models.Negocio.PreguntaEntidad
+@{
+    ViewBag.Title = "ProbarActividad";
+    Layout = "~/Views/Shared/_LayoutDocente.cshtml";
+    LogicEncriptacionMetodos _objEnc = new LogicEncriptacionMetodos();
+    int idAc = ViewBag.idAct;
+
+}
+
+@Styles.Render("~/Content/plugins/progress-bar/number-pb.css")
+@Styles.Render("~/Content/plugins/progress-bar/normalize.css")
+@Scripts.Render("~/Scripts/Actividad/actividad.js")
+<body onload="back('@ViewBag.EstadoActividad')">
+    <br />
+    <div class="row">
+        <div class="col-lg-12">
+            @{
+                var indice = ViewBag.indexControl;
+                var indiceOpciones = -1;
+
+    //recorre las tablas de la actividad
+    <div id="pregunta" data-idpre="@Model.idPregunta" data-tipo="@Model.objTipo.tipo" data-indice="@indice" data-actividad="@ViewBag.idAct">
+        <div class="portlet portlet-basic bg-contenedor">
+            <div class="row">
+                <div id="cabPregunta" class="col-lg-12">
+                    <div class="container">
+                        <div class="col-sm-4 header">
+                            <a href="@Url.Action("verActividadesDocente", "Docente", new { @area = ""})">
+                                <i class="fa fa-chevron-circle-left text-green"></i> EXIT
+                                <strong> Try Activity</strong>
+                            </a>
+                        </div>
+                        <section id="basic" class="col-sm-8">
+                            <article>
+                                <div class="number-pb">
+                                    <div class="number-pb-shown"></div>
+                                    <div class="number-pb-num">0</div>
+                                </div>
+                            </article>
+                        </section>
+                    </div>
+                    <div class="row">
+                        <div class="word-box col-lg-12">
+                            <div class="word-box-1 col-lg-10 col-lg-offset-1">
+                                <h3><i class="fa fa-star fa-lg"></i> @Model.indicaciones<span class="info"> (@Model.destreza @Model.ponderacion Pts.)</span></h3>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    @if (Model.objApoyo != null && Model.objApoyo.idApoyo != 0)
+                    {
+                        <div class="row">
+                            <div class="col-lg-10 col-lg-offset-1" style="text-align:center">
+                                @if (Model.objApoyo.enunciado != "" && Model.objApoyo.enunciado != null)
+                                {
+                                    <h4>Read the text in the box</h4>
+                                    <div>
+                                        <div class="info-apoyo" style="text-align:center">
+                                            <p>@Model.objApoyo.enunciado</p>
+                                        </div>
+                                    </div>
+                                }
+                                @if (Model.objApoyo.imagen != "" && Model.objApoyo.imagen != null)
+                                {
+                                    <br />
+                                    <h4>Look at the picture</h4>
+                                    <img class="img-responsive imgcenter" src="../Img/imgApoyo/@Model.objApoyo.imagen" alt="" />
+                                    <br />
+                                }
+                                @if (Model.objApoyo.link != "" && Model.objApoyo.link != null)
+                                {
+                                    <br />
+                                    <h4>Play the video</h4>
+                                    <br />
+                                    <div class="panel col-lg-10 col-lg-offset-1" style="text-align:center">
+                                        <iframe id="tamanioVideo" class="img-responsive" src="@Model.objApoyo.link" frameborder="0"></iframe>
+                                    </div>
+
+                                }
+                                @if (Model.objApoyo.audio != "")
+                                {
+                                    <br />
+                                    <h4>Play the audio</h4>
+                                    <br />
+                                    <div class="panel col-lg-10 col-lg-offset-1" style="text-align:center">
+                                        <audio src="../Img/audioApoyo/@Model.objApoyo.audio" controls></audio>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.objTipo.tipo == "Pertenencia" || (Model.objTipo.tipo == "Completar" && Model.mostarOpciones == true))
+                    {
+                        <div class="col-xs-10 col-xs-offset-1" style="text-align:center">
+                            <h4>Write in the blank space with the words below. Use capital letter where it is necessary</h4>
+                            <br />
+                            <ul class="list-inline tabbed-portlets">
+                                @foreach (var respuesta in Model.listaRespuestaDesordenada)
+                                {
+                                    <li>
+                                        <p><code>@respuesta.detalleRespuesta</code></p>
+                                    </li>
+                                }
+                            </ul>
+                            <span class="divider"></span>
+                        </div>
+                    }
+                </div>
+                <div id="detPregunta" class="col-lg-12">
+                    <form role="form" name="frmPregunta" id="frmPregunta">
+                        <div class="col-lg-10 col-lg-offset-1 a">
+                            <br />
+                            <br />
+                            <div class="row content-detalle">
+                                @if (Model.objTipo.tipo == "Traducir" || Model.objTipo.tipo == "Ordenar")
+                                {
+                                    indiceOpciones = -1;
+                                    <h4 style="text-align:center">Use capital letter where it is necessary</h4>
+                                    <br />
+                                    foreach (var opcion in Model.listaOpciones)
+                                    {
+                                        indiceOpciones++;
+                                        <div class="form-group fg">
+                                            <h4 class="col-sm-6 col-xs-11" style="text-align:center">@opcion.detallePregunta</h4>
+                                            <div class="col-sm-6 col-xs-11">
+                                                <input name="idOpcionPregunta" type="hidden" value="@opcion.idOpciones" />
+                                                <input class="form-control input-text-g respuesta-@indiceOpciones" type="text" name="respuestaIngresada" value="" required />
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <br />
+                                    }
+                                }
+
+                                else if (Model.objTipo.tipo == "Seleccion Multiple")
+                                {
+                                    indiceOpciones = -1;
+                                    foreach (var opcion in Model.listaOpciones)
+                                    {
+                                        indiceOpciones++;
+                                        <div class="form-group content-select fg">
+                                            <div class="checkbox">
+                                                <input name="idOpcionSeleccion" id="idOpcionSeleccion+@indiceOpciones" class="form-control" type="hidden" value="@opcion.idOpciones" />
+                                                <input type="checkbox" class="respuesta-@indiceOpciones" name="respuestaIngresada" value="" />
+                                                <h4>@opcion.detallePregunta</h4>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+
+                                else if (Model.objTipo.tipo == "Imagen")
+                                {
+                                    indiceOpciones = -1;
+                                    <h4 style="text-align:center">Use capital letter where it is necessary</h4>
+                                    <br />
+                                    foreach (var opcion in Model.listaOpciones)
+                                    {
+                                        indiceOpciones++;
+                                        <div class="col-md-4 col-sm-6 col-xs-12 fg">
+                                            <div class="portlet portlet-green">
+                                                <div style="text-align:center" class="portlet-body">
+                                                    <div class="row">
+                                                        <div class="col-sm-12" style="text-align:center">
+                                                            <img style="height:160px" class="img-responsive" src="../Img/imgActividad/@opcion.detallePregunta" alt="" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="portlet-footer @indiceOpciones">
+                                                    <input name="idOpcionPregunta" class="form-control input-text-t" type="hidden" value="@opcion.idOpciones" />
+                                                    <input type="text" class="form-control input-text-g respuesta-@indiceOpciones" name="respuestaIngresada" value="" required />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+
+                                else if (Model.objTipo.tipo == "Completar")
+                                {
+                                    indiceOpciones = -1;
+                                    foreach (var opcion in Model.listaOpciones)
+                                    {
+                                        indiceOpciones++;
+                                        <div class="fg">
+                                            @{
+                                        var palabrasCadena = opcion.detallePregunta.Split(new Char[] { ' ' });
+                                        var espacio = " ";
+                                        <h4 class="padding-h4">
+                                            @foreach (var palabra in palabrasCadena)
+                                            {
+                                                if (palabra.Contains("_"))
+                                                {
+                                                    <input name="idOpcionPregunta" type="hidden" value="@opcion.idOpciones" />
+                                                    <input type="text" class="form-control input-completar input-text-g respuesta-@indiceOpciones" name="respuestaIngresada" value="" required />
+                                                    var remplazo = palabra.Replace("_", "");
+                                                    @remplazo @espacio
+                                                }
+                                                else
+                                                {
+                                                    @palabra @espacio
+                                                }
+                                            }
+                                        </h4>
+                                            }
+                                        </div>
+                                    }
+                                }
+
+                                else if (Model.objTipo.tipo == "Pertenencia")
+                                {
+                                    var columnas = Model.listaOpciones.Count();
+                                    var filas = Model.listaRespuesta.Count() / columnas;
+                                    <div class="table-responsive">
+                                        <table id="example-table" class="table table-striped table-bordered table-green">
+                                            <thead>
+                                                <tr style="text-align:center">
+                                                    @foreach (var opcion in Model.listaOpciones)
+                                                    {
+                                                        <th>@opcion.detallePregunta</th>
+                                                    }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{ var contador = -1;}
+                                                @for (int i = 0; i < filas; i++)
+                                                {
+                                                    <tr>
+                                                        @for (int col = 0; col < columnas; col++)
+                                                        {
+                                                            contador++;
+                                                            //indiceOpciones++;
+                                                            <td class="@contador fg">
+                                                                <input type="hidden" name="idOpcionPregunta" value="@Model.listaOpciones[col].idOpciones" />
+                                                                <input type="text" class="form-control input-text-g respuesta-@contador" name="respuestaIngresada" value="" />
+                                                            </td>
+                                                        }
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                                else if (Model.objTipo.tipo == "Emparejamiento")
+                                {
+                                    indiceOpciones = -1;
+                                    <h4>Drag the boxes from right to left</h4>
+                                    <br />
+                                    <table class="table  table-style table-responsive">
+                                        <tbody>
+                                            @foreach (var opcion in Model.listaOpciones)
+                                            {
+                                                indiceOpciones++;
+                                                <tr class="table-style">
+                                                    <td class="col-xs-4">
+                                                        <div class="row tile green" data-num=""><h5>@opcion.detallePregunta</h5></div>
+                                                    </td>
+                                                    <td class="col-xs-4 soltable fg"></td>
+                                                    <td class="col-xs-4">
+                                                        <div class="respuesta row tile green">
+                                                            <h5>@Model.listaRespuestaDesordenada[indiceOpciones].detalleRespuesta</h5>
+                                                            <input type="hidden" name="idOpcionPregunta" value="@Model.listaRespuestaDesordenada[indiceOpciones].idOpciones" />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                            </div>
+                            <br />
+                            <br />
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+            <div class="portlet-footer">
+                @if (ViewBag.UltP == false)
+                {
+                <div class="row">
+                    <div class="col-lg-12 footer-box" style="text-align:right">
+                        <input type="button" name="calificar" id="calificar" class="btn btn-success" onclick="obtenerDatos('da')" value="Check" form="frmPregunta" />
+                        <input type="button" name="siguiente" id="siguiente" class="btn btn-success" onclick="location.href ='../Actividad/Probar?idAEn=@_objEnc.Encrypt(idAc.ToString())&indPreEn=@_objEnc.Encrypt(indice.ToString())'" value="Continue" form="frmPregunta" />
+                    </div>
+                </div>
+
+                }
+                else
+                {
+                <div class="row">
+                    <div class="col-lg-12 footer-box" style="text-align:right">
+                        <input type="button" name="calificar" id="calificar" class="btn btn-success" onclick="obtenerDatos('da')" value="Check" form="frmPregunta" />
+                        <input type="button" name="siguiente" id="siguiente" class="btn btn-success" onclick="location.href = '../Actividad/Calificacion?idActividadDe=@_objEnc.Encrypt(idAc.ToString())'" value="Continue" form="frmPregunta" />
+                    </div>
+                </div>
+
+                }
+            </div>
+
+        </div>
+
+    </div>
+
+
+            }
+
+        </div>
+    </div>
+</body>
+@Scripts.Render("~/Scripts/plugins/progress-bar/jquery.velocity.min.js")
+@Scripts.Render("~/Scripts/plugins/progress-bar/number-pb.js")
+
+<script>
+    $(function () {
+
+        function numInterval() {
+            var min = 0;
+            var max = '@ViewBag.numUltimaPre';
+            return [min, max];
+        }
+
+        // setup
+        var $basic = $('#basic');
+        var interval = numInterval();
+        var basicBar = $basic.find('.number-pb').NumberProgressBar({
+            style: 'basic',
+            min: interval[0],
+            max: interval[1],
+            duration: 0
+        })
+
+
+        // loop
+        var vieB = '@ViewBag.indexControl';
+        function basicLoop(vieB) {
+            basicBar.reach(vieB);
+        }
+        basicLoop(vieB);
+    });
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

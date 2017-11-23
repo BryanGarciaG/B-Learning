@@ -1,0 +1,412 @@
+﻿@using BLearning.Models.Negocio
+@using Newtonsoft.Json;
+
+@model VariosModel
+
+@{
+    ViewBag.Title = "Activities";
+    Layout = "~/Views/Shared/_LayoutAdministrador.cshtml";
+    var hoy = DateTime.Now.ToString("yyyy-MM-dd");
+    LogicEncriptacionMetodos _objEncryp = new LogicEncriptacionMetodos();
+    List<ActividadesXDocenteEntidad> listActiXRevi = (List<ActividadesXDocenteEntidad>)ViewBag.ActiXRev;
+
+}
+
+
+
+
+<link href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet" />
+
+@Styles.Render("~/Content/bootstrap-select.css")
+@Styles.Render("~/Content/plugins/datatables/datatables.css")
+@Styles.Render("~/Content/plugins/datatables/jquery.dataTables.min.css")
+
+<!-- begin PAGE TITLE AREA -->
+<!-- Use this section for each page's title and breadcrumb layout. In this example a date range picker is included within the breadcrumb. -->
+<div class=" row">
+    <div class="col-lg-12">
+        <div class="page-title">
+            <h1>
+                Content Activities
+            </h1>
+            <ol class="breadcrumb">
+                <li>
+                    <i class="fa fa-book"></i><a href="#" onclick="return false;"> Activities</a>
+                </li>
+            </ol>
+
+        </div>
+    </div>
+</div>
+<div class=" row">
+    <div class="col-lg-12">
+
+        <div class="portlet portlet-default">
+            <div class="portlet-heading">
+                <div class="portlet-title">
+                    <h4>My activities</h4>
+                </div>
+                <div class=" portlet-widgets">
+                    <a href="@Url.Action("crearpreguntasAdmin", "Administrador", new { @area =""})" class=" btn btn-orange"><span class="fa fa-plus-square"></span> &nbsp; New activity</a>
+                    &nbsp;
+                    <a data-toggle="collapse" data-parent="#accordion" href="#myActCollapse" class=""><i class="fa fa-chevron-down"></i></a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div id="myActCollapse" class=" panel-collapse in">
+                <div class="portlet-body">
+                    <div id="myPillsContent" class="tab-content">
+                        <div class="tab-pane fade  active in" id="practicas">
+                            <div class=" row">
+                                <div class="col-lg-12">
+                                    <div class="table-responsive">
+                                        <div id="example-table_wrapper" class="dataTables_wrapper form-inline" role="grid">
+                                            <table id="tabla-MyActi" class="table table-striped table-bordered table-hover table-green dataTable" aria-describedby="example-table_info">
+                                                <thead>
+                                                    <tr role="row">
+                                                        <th class="sorting_asc" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 25%;">Topic</th>
+                                                        <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 8%;">Level</th>
+                                                        <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 263px;">Skills</th>
+                                                        <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 10%;">Duration</th>
+                                                        <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 10%;">Questions</th>
+                                                        <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 10%;">Created</th>
+                                                        <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 10%;">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody role="alert" aria-live="polite" aria-relevant="all">
+                                                    @foreach (var item in Model.listaActXDoc)
+                                                    {
+                                                        <tr class="gradeA odd">
+                                                            <td class=" ">
+                                                                <a data-idacti="@item.idActividad" href="@Url.Action("revisarActividadAdmin", new {@area = "", idActivEn = _objEncryp.Encrypt(item.idActividad.ToString()), tema = _objEncryp.Encrypt(item.descripcion), nuNivelEn = _objEncryp.Encrypt(item.idNivel.ToString()) })">@item.descripcion</a>
+                                                            </td>
+                                                            <td>@item.idNivel</td>
+                                                            <td>@item.Destrezas</td>
+                                                            <td class=" ">@item.duracion min</td>
+                                                            <td class="center ">@item.nPreguntas</td>
+                                                            <td class="center ">@item.fechaCreacion.ToString("d")</td>
+                                                            @if (item.isReportad == 1)
+                                                            {
+                                                                <td class="center ">In review</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td>
+                                                                <div class="btn-group">
+                                                                    <button type="button" class="btn btn-xs btn-green dropdown-toggle" data-toggle="dropdown">
+                                                                        Actions
+                                                                        <span class="caret"></span>
+                                                                    </button>
+                                                                    <ul class="dropdown-menu pull-right" role="menu">
+                                                                        <li>
+                                                                            <a data-idac="@item.idActividad" href="#" onclick="verActi(this)">View</a>
+                                                                        </li>
+                                                                        <li>
+                                                                            <a data-idacti="@item.idActividad" href="@Url.Action("revisarActividadAdmin", new {@area="", idActivEn = _objEncryp.Encrypt(item.idActividad.ToString()), tema = _objEncryp.Encrypt(item.descripcion), nuNivelEn = _objEncryp.Encrypt(item.idNivel.ToString()) })">Edit</a>
+                                                                        </li>
+                                                                        <li>
+                                                                            <a onclick="msgElimnarActi(@item.idActividad); return false;" href="#">Delete</a>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </td>
+                                                            }
+                                                            
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="col-lg-12">
+
+        <div class="portlet portlet-default">
+            <div class="portlet-heading">
+                <div class="portlet-title">
+                    <h4>Activities to review</h4>
+                </div>
+                <div class=" portlet-widgets">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#myActCollapse" class=""><i class="fa fa-chevron-down"></i></a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div id="myActCollapse" class=" panel-collapse in">
+                <div class="portlet-body">
+                    @if (listActiXRevi.Count == 0)
+                    {
+                        <div class=" row">
+                            <div class="col-lg-12">
+                                <br />
+                                <p class="text-center text-muted">No data</p>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div id="myPillsContent" class="tab-content">
+                            <div class="tab-pane fade  active in" id="">
+                                <div class=" row">
+                                    <div class="col-lg-12">
+                                        <div class="table-responsive">
+                                            <div id="example-table_wrapper" class="dataTables_wrapper form-inline" role="grid">
+                                                <table id="tabla-MyActi" class="table table-striped table-bordered table-hover table-green dataTable" aria-describedby="example-table_info">
+                                                    <thead>
+                                                        <tr role="row">
+                                                            <th class="sorting_asc" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 25%;">Title</th>
+                                                            <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 8%;">Nivel</th>
+                                                            <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 263px;">Abilities</th>
+                                                            <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 10%;">Duration</th>
+                                                            <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 10%;">Questions</th>
+                                                            <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 10%;">Created by</th>
+                                                            <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 10%;">Reported by</th>
+                                                            <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 10%;">Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody role="alert" aria-live="polite" aria-relevant="all">
+                                                        @{ int idActividadAnterior = 0;}
+                                                        @foreach (var item in listActiXRevi)
+                                                    {
+                                                        if (item.idActividad == idActividadAnterior)
+                                                        {
+                                                            continue;
+                                                        }
+                                                            <tr class="gradeA odd">
+                                                                <td class=" ">
+                                                                    <a data-idacti="@item.idActividad" href="@Url.Action("verActividad", "Reportes", new {@area="", idA = item.idActividad })">@item.descripcion</a>
+                                                                </td>
+                                                                <td>@item.idNivel</td>
+                                                                <td>@item.Destrezas</td>
+                                                                <td class=" ">@item.duracion min</td>
+                                                                <td class="center ">@item.nPreguntas</td>
+                                                                <td class="center ">@item.docente</td>
+                                                                <td class="center ">@item.docenteReporta</td>
+                                                                <td>
+                                                                    <div class="btn-group">
+                                                                        <button type="button" class="btn btn-xs btn-green dropdown-toggle" data-toggle="dropdown">
+                                                                            Actions
+                                                                            <span class="caret"></span>
+                                                                        </button>
+                                                                        <ul class="dropdown-menu pull-right" role="menu">
+                                                                            <li>
+                                                                                <a data-idacti="@item.idActividad" href="@Url.Action("verActividad", "Reportes", new {@area = "", idA = item.idActividad })">View/Edit</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a data-idacti="@item.idActividad" data-opcion="2" onclick="actividadRevisada(this);return false;" href="#">It's OK</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a data-idacti="@item.idActividad" data-opcion="1" onclick="msgElimnarReporte(this); return false;" href="#">Delete</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                             idActividadAnterior = item.idActividad; 
+                                                    }
+                                                    </tbody>
+                                                </table>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalGif" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:60%" role="document">
+        <div id="contenedor">
+            <div class="loader" id="loader">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#tabla-Xnivel').DataTable({
+        });
+        $('#tabla-MyActi').DataTable({
+        });
+    });
+
+    function msgElimnarReporte(me) {
+        Messenger.options = {
+            extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+            theme: 'flat'
+        }
+        msg = Messenger().post({
+            message: 'Are you sure?',
+            actions: {
+                delete: {
+                    label: "Delete",
+                    action: function () {
+                        msg.hide();
+                        actividadRevisada(me)
+                    }
+                },
+
+                cancel: {
+                    action: function () {
+                        msg.hide();
+                        return false;
+                    }
+                }
+            }
+        });
+    }
+
+
+    function actividadRevisada(me) {
+        var idAct = $(me).data("idacti");
+        var opc = $(me).data("opcion");
+        $.ajax({
+            url: "../Administrador/actividadRevisada",
+            type: 'POST',
+            data: JSON.stringify({ opcion: opc, idActividad: idAct }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (data) {
+                if (data == 1) {
+                    Messenger.options = {
+                        extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                        theme: 'flat'
+                    }
+                    Messenger().post({
+                        message: 'Activity successfully deleted',
+                        type: 'success',
+                        hideAfter: 3,
+                        showCloseButton: false
+                    });
+                    location.reload();
+                    return false;
+                }
+                else {
+                    Messenger.options = {
+                        extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                        theme: 'flat'
+                    }
+                    Messenger().post({
+                        message: "It's OK!!!",
+                        type: 'success',
+                        hideAfter: 3,
+                        showCloseButton: false
+                    });
+                    location.reload();
+                }
+            },
+            beforeSend: function () {
+                $("#modalGif").modal('show');
+            },
+            complete: function () {
+                $("#modalGif").modal('hide');
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+            }
+        });
+    }
+
+    function msgElimnarActi(id) {
+        Messenger.options = {
+            extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+            theme: 'flat'
+        }
+        msg = Messenger().post({
+            message: 'are you sure?',
+            actions: {
+                delete: {
+                    label: "Delete",
+                    action: function () {
+                        msg.hide();
+                        eliminarActividad(id)
+                    }
+                },
+
+                cancel: {
+                    action: function () {
+                        msg.hide();
+                        return false;
+                    }
+                }
+            }
+        });
+    }
+
+    function eliminarActividad(id) {
+        var idA = id;
+        $.ajax({
+            url: "../Administrador/eliminarActividad",
+            type: 'POST',
+            data: JSON.stringify({ _idActividad: idA }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (data) {
+                if (data == 0) {
+                    Messenger.options = {
+                        extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                        theme: 'flat'
+                    }
+                    Messenger().post({
+                        message: 'Activity successfully removed',
+                        type: 'success',
+                        hideAfter: 3,
+                        showCloseButton: false
+                    });
+                    location.reload();
+                }
+                else {
+                    Messenger.options = {
+                        extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                        theme: 'flat'
+                    }
+                    Messenger().post({
+                        message: 'This activity can not be deleted. Assigned or already resolved',
+                        type: 'error',
+                        hideAfter: 3,
+                        showCloseButton: false
+                    });
+                }
+            },
+            beforeSend: function () {
+                $("#modalGif").modal('show');
+            },
+            complete: function () {
+                $("#modalGif").modal('hide');
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+            }
+        });
+    }
+
+    function verActi(me) {
+        location.href = '../Reportes/verActividad?idA=' + encodeURIComponent($(me).data("idac"));
+        
+        }
+
+</script>
+
+@Scripts.Render("~/Scripts/plugins/datatables/jquery.dataTables.min.js")
+@Scripts.Render("~/Scripts/plugins/datatables/jquery.dataTables.js")
+@Scripts.Render("~/Scripts/plugins/datatables/datatables-bs3.js")
+@Scripts.Render("~/Scripts/bootstrap-select.min.js")
+
+
+
+

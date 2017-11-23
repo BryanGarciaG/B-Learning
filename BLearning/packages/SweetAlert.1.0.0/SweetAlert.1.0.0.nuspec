@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>SweetAlert</id>
+    <version>1.0.0</version>
+    <title>Sweet Alert for Bootstrap</title>
+    <authors>Chad Chambers</authors>
+    <owners>Chad Chambers</owners>
+    <licenseUrl>https://raw.githubusercontent.com/lipis/bootstrap-sweetalert/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/lipis/bootstrap-sweetalert</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This is just a clone for Bootstrap of the original SweetAlert.</description>
+    <summary>A beautiful replacement for JavaScript's "alert"</summary>
+  </metadata>
+</package>

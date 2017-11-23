@@ -1,0 +1,236 @@
+﻿@using BLearning.Models.Negocio
+@model List<EfectividadEntidad>
+@{
+    ViewBag.Title = "Score";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    LogicEncriptacionMetodos _objEnc = new LogicEncriptacionMetodos();
+    int idLe = ViewBag.idLeccion;
+    string numLecc = ViewBag.numeroLeccion;
+}
+<style>
+    .centrado{
+        text-align: center;
+    }
+    .gauge {
+        height: 100px;
+    }
+</style>
+<script>
+    function back() {
+        window.location.hash = "no";
+        window.location.hash = "Again-No" //chrome
+        window.onhashchange = function () { window.location.hash = "no"; }
+    }
+</script>
+    <body onload="back()">
+        <div class="row">
+            <br />
+            <br />
+            <div class="col-lg-12">
+                <div class="portlet bg-primary">
+                    <div class="portlet-body">
+                        <div class="row">
+                            <div class="circle-tile-content" style="background-color: #16a085">
+                                <div class="circle-tile-number text-faded">
+                                    <h2 class="centrado"><i class="fa fa-check fa-fw"></i> Lesson completed!</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <br />
+                        <div class="row">
+                            <div class="col-lg-12 centrado">
+                                <div class="col-xs-12 text-center">
+                                    <img class="img-responsive" id="img-cali-star" style="height: 200px; margin:auto" src="" alt="Alternate Text" />
+                                </div>
+                                <h3 id="mens1" style="color:black"></h3>
+                                <h4 id="mens2" style="color: black"></h4>
+                                <h5 style="color:gray">Observe your score and the effectiveness of the answers in the charts</h5>
+                                <h3 style="color: gray" id="calif" data-valor="@ViewBag.calificacion">@ViewBag.calificacion/100 pts.</h3>
+                            </div>
+                        </div>
+                        <br />
+                        @if (Model.Count == 1)
+                        {
+                            <div class="row">
+                                <div class="col-lg-4  col-md-6 col-lg-offset-4 col-md-offset-3" style="text-align:center">
+                                    @{ var contador = 0;
+                                     foreach (var item in Model)
+                                     {
+                                         contador = contador + 1;
+                                         var calificacion = item.porcentaje;
+                                         var ident = "gauge" + contador;
+                                         var title = "#" + contador;
+                                         var label = "";
+                                         if (item.tipoEfectividad == "L")
+                                         {
+                                             label = "Listening";
+                                         }
+                                         if (item.tipoEfectividad == "R")
+                                         {
+                                             label = "Reading";
+                                         }
+                                         if (item.tipoEfectividad == "G")
+                                         {
+                                             label = "Grammar/Vocabulary";
+                                         }
+                                        <div id="@ident" class="gauge col-md-12 " data-title="@title" data-value="@calificacion" data-label="@label"></div>
+                                     }
+                                    }
+                                </div>
+                            </div>
+                        }
+                        else if (Model.Count == 2)
+                        {
+                            <div class="row">
+                                <div class="col-lg-8  col-md-12 col-lg-offset-2 col-md-offset-0" style="text-align:center">
+                                    @{ var contador = 0;
+                                     foreach (var item in Model)
+                                     {
+                                         contador = contador + 1;
+                                         var calificacion = item.porcentaje;
+                                         var ident = "gauge" + contador;
+                                         var title = "#" + contador;
+                                         var label = "";
+                                         if (item.tipoEfectividad == "L")
+                                         {
+                                             label = "Listening";
+                                         }
+                                         if (item.tipoEfectividad == "R")
+                                         {
+                                             label = "Reading";
+                                         }
+                                         if (item.tipoEfectividad == "G")
+                                         {
+                                             label = "Grammar/Vocabulary";
+                                         }
+                                        <div id="@ident" class="gauge col-md-4 col-md-offset-1" data-title="@title" data-value="@calificacion" data-label="@label"></div>
+                                     }
+                                    }
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="row">
+                            <div class="col-md-12" style="text-align:center">
+                                @{ var contador = 0;
+                                 foreach (var item in Model)
+                                 {
+                                     contador = contador + 1;
+                                     var calificacion = item.porcentaje;
+                                     var ident = "gauge" + contador;
+                                     var title = "#" + contador;
+                                     var label = "";
+                                     if (item.tipoEfectividad == "L")
+                                     {
+                                         label = "Listening";
+                                     }
+                                     if (item.tipoEfectividad == "R")
+                                     {
+                                         label = "Reading";
+                                     }
+                                     if (item.tipoEfectividad == "G")
+                                     {
+                                         label = "Grammar/Vocabulary";
+                                     }
+                                    <div id="@ident" class="gauge col-md-4 col-md-offset-1" data-title="@title" data-value="@calificacion" data-label="@label"></div>
+                                 }
+                                }
+                            </div>
+                        </div>
+                        }
+                        <br />
+                    </div>
+                    <div class="portlet-footer footer-box" style="text-align:right">
+                        <input type="button" class="btn btn-success" onclick="location.href='../Estudiante/Actividades?idLeccionEn=@_objEnc.Encrypt(idLe.ToString())&n=@_objEnc.Encrypt(numLecc)'" value="Continue" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+
+    @Scripts.Render("~/Scripts/raphael-2.1.4.min.js")
+@Scripts.Render("~/Scripts/justgage.js")
+@Scripts.Render("~/Scripts/estado-calificacion.js")
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function (event) {
+
+            BeforeUnloadEvent
+            var gauge1 = new JustGage({
+                id: "gauge1",
+                value: 15,
+                label: "Listening",
+                decimals: 0,
+                counter: true,
+                gaugeWidthScale: 0.8,
+                customSectors: {
+                    ranges: [{
+                        color: "#ff3b30",
+                        lo: 0,
+                        hi: 50
+                    }, {
+                        color: "#43bf58",
+                        lo: 51,
+                        hi: 100
+                    }]
+                },
+                counter: true,
+                textRenderer: function (val) {
+                    return (val + '%');
+                },
+            });
+
+            var gauge2 = new JustGage({
+                id: "gauge2",
+                value: 50,
+                label: "Reading",
+                humanFriendly: false,
+                gaugeWidthScale: 0.8,
+                customSectors: {
+                    ranges: [{
+                        color: "#ff3b30",
+                        lo : 0,
+                        hi : 50
+                    },{
+                        color :"#43bf58", 
+                        lo : 51,
+                        hi : 100
+                    }]
+                },
+                decimals: 0,
+                counter: true,
+                textRenderer: function (val) {
+                    return (val + '%');
+                },
+            });
+
+            var gauge3 = new JustGage({
+                id: "gauge3",
+                label: "Grammar/Vocabulary",
+                gaugeWidthScale: 0.8,
+                customSectors: {
+                    ranges: [{
+                        color: "#ff3b30",
+                        lo: 0,
+                        hi: 50
+                    }, {
+                        color: "#43bf58",
+                        lo: 51,
+                        hi: 100
+                    }]
+                },
+                decimals: 0,
+                counter: true,
+                textRenderer: function (val) {
+                    return (val + '%');
+                },
+            });
+        });
+
+        agregarMensaje();
+
+    </script>

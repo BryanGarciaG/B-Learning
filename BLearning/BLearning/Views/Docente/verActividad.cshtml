@@ -1,0 +1,278 @@
+﻿@using BLearning.Models.Negocio
+@model List<BLearning.Models.Negocio.PreguntaEntidad>
+@{
+    ViewBag.Title = "Actividad";
+    LogicEncriptacionMetodos _objEnc = new LogicEncriptacionMetodos();
+    ActividadEntidad _objActividad = (ActividadEntidad)ViewData["CabeceraActividad"];
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <br />
+        <div class="portlet portlet-basic bg-contenedor">
+            <div class="row">
+                <div class="col-lg-10 col-lg-offset-1">
+                    <br />
+                    <br />
+                    <br />
+                    <h3 style="text-transform:uppercase; text-align:center">
+                        <strong>@_objActividad.descripcion</strong>
+                    </h3>
+                    <br />
+                </div>
+
+            </div>
+            @{var I = 0;}
+            @foreach (var item in Model)
+            {
+                I++;
+                <div class="row">
+                    <div id="cabPregunta" class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-10 col-lg-offset-1">
+                                <h4><strong><i class="number">@I)</i> @item.indicaciones<span class="info"> (@item.destreza @item.ponderacion Pts.)</span></strong></h4>
+                            </div>
+                        </div>
+                        @if (item.objApoyo != null && item.objApoyo.idApoyo != 0)
+                        {
+                            <div class="row">
+                                <div class="col-lg-10 col-lg-offset-1" style="text-align:center">
+                                    @if (item.objApoyo.enunciado != "" && item.objApoyo.enunciado != null)
+                                    {
+                                        <h4>Read the text in the box</h4>
+                                        <div>
+                                            <div class="info-apoyo" style="text-align:center">
+                                                <p>@item.objApoyo.enunciado</p>
+                                            </div>
+                                        </div>
+                                    }
+                                    @if (item.objApoyo.imagen != "" && item.objApoyo.imagen != null)
+                                    {
+                                        <h4>Look at the picture</h4>
+    <img class="img-responsive imgcenter" src="../Img/imgApoyo/@item.objApoyo.imagen" alt="" />
+                                    }
+                                    @if (item.objApoyo.link != "" && item.objApoyo.link != null)
+                                    {
+                                        <h4>Play the video</h4>
+                                        <div class="panel col-lg-10 col-lg-offset-1" style="text-align:center">
+                                            <iframe id="tamanioVideo" class="img-responsive" src="@item.objApoyo.link" frameborder="0"></iframe>
+                                        </div>
+
+                                    }
+                                    @if (item.objApoyo.audio != "")
+                                    {
+                                        <h4>Play the audio</h4>
+                                        <div class="panel col-lg-10 col-lg-offset-1" style="text-align:center">
+                                            <audio src="../img/audioApoyo/@item.objApoyo.audio" controls></audio>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div id="detPregunta" class="col-lg-12">
+                        <div class="col-lg-10 col-lg-offset-1 a">
+                            <div class="row content-detalle">
+                                @if (item.objTipo.tipo == "Traducir" || item.objTipo.tipo == "Ordenar")
+                                {
+                                    foreach (var opcion in item.listaOpciones.Where(c => c.idCabeceraPregunta == item.idPregunta))
+                                    {
+                                        <h5 class="col-sm-6 col-xs-11 greater" style="text-align:center">@opcion.detallePregunta</h5>
+                                        <div class="col-sm-6 col-xs-11">
+                                            <h5 class="greater text-green">@item.listaRespuesta.Where(c => c.idOpciones == opcion.idOpciones).First().detalleRespuesta</h5>
+                                        </div>
+                                    }
+
+                                }
+
+                                else if (item.objTipo.tipo == "Seleccion Multiple")
+                                {
+                                    <br />
+                                    foreach (var opcion in item.listaOpciones)
+                                    {
+                                        <div class="form-group content-select fg">
+                                            <div class="checkbox">
+                                                @{
+                                                    if (item.listaRespuesta.Find(c => c.idOpciones == opcion.idOpciones) !=null)
+                                                    {
+                                                        <input type="checkbox" checked disabled/>
+                                                        <h5 class="greater">@opcion.detallePregunta</h5>
+                                                    }
+                                                    else
+                                                    { 
+                                                        <input type="checkbox"  disabled/>
+                                                        <h5 class="greater">@opcion.detallePregunta</h5> }
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                }
+
+                                else if (item.objTipo.tipo == "Imagen")
+                                {
+                                    <br />
+                                    <div class="col-lg-12">
+                                        @foreach (var opcion in item.listaOpciones)
+                                        {
+                                            <div class="col-md-3 col-sm-4 col-xs-12 fg">
+                                                <div class="portlet portlet-green">
+                                                    <div style="text-align:center" class="portlet-body">
+                                                        <div class="row">
+                                                            <div class="col-sm-12" style="text-align:center">
+                                                                <img style="height:160px" class="img-responsive" src="../Img/imgActividad/@opcion.detallePregunta" alt="" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="portlet-footer" style="text-align:center">
+                                                        <h5 class="greater">@item.listaRespuesta.Where(c => c.idOpciones == opcion.idOpciones).First().detalleRespuesta</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+
+                                }
+
+                                else if (item.objTipo.tipo == "Completar")
+                                {
+                                    foreach (var opcion in item.listaOpciones)
+                                    {
+                                        <div class="fg">
+                                            @{
+                                        var palabrasCadena = opcion.detallePregunta.Split(new Char[] { ' ' });
+                                        var espacio = " ";
+                                        <h5 class="greater" style="margin-left:25px">
+
+                                            @foreach (var palabra in palabrasCadena)
+                                            {
+                                                if (palabra.Contains("_"))
+                                                {
+                                                    RespuestaEntidad respuesta = item.listaRespuesta.Where(c => c.idOpciones == opcion.idOpciones).First();
+                                                    <strong class="badge green" style="font-size:16px">@respuesta.detalleRespuesta</strong> @espacio
+                                                    item.listaRespuesta.Remove(respuesta);
+                                                    var remplazo = palabra.Replace("_", "");
+                                                    @remplazo @espacio
+                                                }
+                                                else
+                                                {
+                                                    @palabra @espacio
+                                                }
+                                            }
+                                        </h5>
+                                            }
+                                        </div>
+                                    }
+                                }
+
+                                else if (item.objTipo.tipo == "Pertenencia")
+                                {
+                                    var columnas = item.listaOpciones.Count();
+                                    var filas = item.listaRespuesta.Count() / columnas;
+                                    <div class="table-responsive">
+                                        <table id="example-table" class="table table-striped table-bordered table-green">
+                                            <thead>
+                                                <tr style="text-align:center">
+                                                    @foreach (var opcion in item.listaOpciones)
+                                                    {
+                                                        <th>@opcion.detallePregunta</th>
+                                                    }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{ var contador = -1;}
+                                                @for (int i = 0; i < filas; i++)
+                                                {
+                                                    <tr>
+                                                        @for (int col = 0; col < columnas; col++)
+                                                        {
+                                                            contador++;
+                                                            RespuestaEntidad respuesta = item.listaRespuesta.Where(c => c.idOpciones == item.listaOpciones[col].idOpciones).First();
+                                                            <td class="@contador fg">
+                                                                @respuesta.detalleRespuesta
+                                                                <input type="hidden" value="@item.listaRespuesta.Remove(respuesta)" />
+                                                            </td>
+                                                        }
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                                else if (item.objTipo.tipo == "Emparejamiento")
+                                {
+                                    <br />
+                                    <div class="col-md-10 col-md-offset-1">
+                                        <table class="table  table-style table-responsive">
+                                            <tbody>
+                                                @foreach (var opcion in item.listaOpciones)
+                                                {
+                                                    <tr class="table-style">
+                                                        <td class="col-xs-5">
+                                                            <div class="row tile green" data-num=""><h5 class="greater">@opcion.detallePregunta</h5></div>
+                                                        </td>
+                                                        <td class="col-xs-2 text-green soltable fg">
+                                                            ______________
+                                                        </td>
+                                                        <td class="col-xs-5">
+                                                            <div class="respuesta row tile green">
+                                                                <h5 class="greater">@item.listaRespuesta.Where(c => c.idOpciones == opcion.idOpciones).First().detalleRespuesta</h5>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            <br />
+            <br />
+            <div class="portlet-footer">
+                <div class="row">
+                    <div class="col-lg-12 footer-box" style="text-align:right">
+                        <input type="button" class="btn btn-success" onclick="location.href ='../Actividad/Probar?idAEn=@_objEnc.Encrypt(_objActividad.idActividad.ToString())&indPreEn=@_objEnc.Encrypt((0).ToString())'" value="Try" />
+                        <input type="button" class="btn btn-default" onclick="reportarActividad()" value="Report" />
+                        <input type="button" name="cerrar" id="cerrar" class="btn btn-red" onclick="history.back();" value="Close" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+</div>
+
+<script>
+    function reportarActividad() {
+        var idActi = '@_objActividad.idActividad';
+        var idPer = $("#idPersonaDocente").val();
+        $.ajax({
+            url: "../Docente/reportarActividad",
+            type: "POST",
+            data: JSON.stringify({ _idActividad: idActi, _idPersLog: idPer }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (result) {
+                Messenger.options = {
+                    extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                    theme: 'flat'
+                }
+                Messenger().post({
+                    message: 'Activity reported. The administrator will review it',
+                    type: 'success',
+                    hideAfter: 3,
+                    showCloseButton: false
+                });
+                return false;
+            }
+        });
+    }
+</script>
+

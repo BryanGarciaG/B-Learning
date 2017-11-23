@@ -1,0 +1,2348 @@
+﻿@using BLearning.Models.Negocio
+@{
+    ViewBag.Title = "Edit activity";
+    int contadorApoyo = 0;
+    int contadorPregu = 0;
+    int conPanel = 0;
+    string tabPane = "tab-pane fade in active";
+    string liActive = "active";
+    decimal contadorPonderacion = 0;
+    List<TipoPreguntaEntidad> listTiposPre = (List<TipoPreguntaEntidad>)ViewBag.TiposPregunta;
+    <script>var arrayTiposPregunta = [];</script>
+
+}
+
+@model List<PreguntaEntidad>
+
+
+@foreach (var item in listTiposPre)
+{
+    <script>
+        var objTP = { "idTipo": '@item.idTipo', "tipo": '@item.tipo' };
+        arrayTiposPregunta.push(objTP);
+    </script>
+}
+
+
+<!--Portled cabecera act-->
+
+<div class="col-lg-12">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="page-title">
+                <h1>
+                    Edit activity
+                    <small> / @ViewBag.Tema</small>
+                </h1>
+                <ol class="breadcrumb">
+                    <li>
+                        <i class="fa fa-book"></i>  <a href="../Docente/verActividadesDocente">My Activities</a>
+                    </li>
+                    <li class="active">@ViewBag.Tema</li>
+                    <li class="pull-right">
+                        <a href="../Docente/verActividadesDocente" onclick="history.back();" class="btn btn-red btn-square date-picker"><i class="fa fa-chevron-circle-left"><span> Back</span></i></a>
+                    </li>
+                </ol>
+            </div>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <div class="row">
+        <div class=" col-lg-12">
+            <div class="portlet portlet-default">
+                <div class="portlet-heading">
+                    <div class="portlet-title">
+                        <h4><i class="fa fa-edit"></i> Edit activity</h4>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="portlet-body" style="min-height:350px">
+                    <!--begin cabecera actividad-->
+                    <div id="camposActividad" class="row">
+                        <input type="hidden" id="idAct" value="@Model[0].idActividad" />
+                        <div class=" col-lg-12">
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <a href="@Url.Action("verActividadesDocente", "Docente", new { @area = ""})" class="btn btn-red btn-block">
+                                        <span class="fa fa-times-circle"></span> &nbsp; Close form
+                                    </a>
+                                </div>
+                            </div>
+                            <div class=" col-md-9">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <div class="input-group ">
+                                                <div class="input-group-btn">
+                                                    <button class="btn dropdown-toggle" data-toggle="dropdown">
+                                                        Level
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu pull-left">
+                                                        @for (int i = 1; i <= 8; i++)
+                                                        {
+                                                            <li class="liTxtDestreza" onclick=" nivelActivi(this)" title="@i">
+                                                                <a onclick="editarCabeActi(); return false;" href="#">@i</a>
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                                <input onchange="editarCabeActi()" class="form-control" type="number" min="1" max="8" style="text-align: justify; background-color: #fff" value="@ViewBag.nuNivel" id="txtNivel">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class=" col-md-9">
+                                        <div class=" form-group">
+                                            <div class=" input-group">
+                                                <div class="input-group-btn">
+                                                    <button class="btn" onclick="return false;">
+                                                        Theme
+                                                    </button>
+                                                </div>
+                                                <input type="text" id="temaAct" onchange="editarCabeActi()" class="form-control" value="@ViewBag.Tema" required="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--end cabecera actividad-->
+                    <div class="row">
+                        <div class=" col-lg-12">
+                            <!--begin nav de cada pregunta-->
+                            <div class="col-sm-3">
+                                <ul id="myStacked" class="nav nav-pills nav-stacked">
+                                    @foreach (var item in Model)
+                                    {
+                                        contadorPregu++;
+                                        if (contadorPregu != 1)
+                                        {
+                                            liActive = "";
+                                        }
+                                        <li class="liBryan @liActive" id="pregunta-@contadorPregu">
+                                            <a id="nP-@contadorPregu" href="#tab-pregunta-@contadorPregu" onclick="currentQue(this)" data-mynumber="@contadorPregu" data-toggle="tab">Question @contadorPregu</a>
+                                        </li>
+                                    }
+                                    @if (ViewBag.IsEditable == 0)
+                                    {
+                                        <li class="liBryan">
+                                            <a onclick="nuevaPregunta(); return false;" class="btn"><i class="fa fa-plus-circle"></i> Add question</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                            <!--end nav de cada pregunta-->
+                            <!--begin panel de cada pregunta-->
+                            <div class="col-sm-9">
+                                <div id="myStackedContent" class="tab-content">
+                                    @foreach (var item in Model)
+                                    {
+                                        conPanel++;
+                                        contadorPonderacion = contadorPonderacion + item.ponderacion;
+                                        if (conPanel != 1)
+                                        {
+                                            tabPane = "tab-pane fade";
+                                        }
+
+                                        <div class="@tabPane" id="tab-pregunta-@conPanel">
+                                            <!--inicia formlario de cabeceraPregunta-->
+                                            <form id="formPregCabe-@conPanel">
+                                                <div class="row">
+                                                    <div class="col-md-5">
+                                                        <div class="form-group">
+                                                            <div class="input-group ">
+                                                                <div class="input-group-btn">
+                                                                    <button class="btn dropdown-toggle btnDrop" onclick="return false;" data-toggle="">
+                                                                        Skill
+                                                                        <span class="caret"></span>
+                                                                    </button>
+                                                                    <ul class="dropdown-menu pull-left">
+                                                                        <li class="liTxtDestreza" onclick="destrezaSltd(this); destrezaSltd(this)" title="Listening">
+                                                                            <a onclick="return false;" href="#">Listening</a>
+                                                                        </li>
+                                                                        <li class="liTxtDestreza" onclick=" destrezaSltd(this)" title="Reading">
+                                                                            <a onclick="return false;" href="#">Reading</a>
+                                                                        </li>
+                                                                        <li class="liTxtDestreza" onclick=" destrezaSltd(this)" title="Grammar/Vocabulary">
+                                                                            <a onclick="return false;" href="#">Grammar/Vocabulary</a>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                                <input class="form-control noEdit" type="text" style="text-align: justify" disabled value="@item.destreza" id="txtDestreza" required="">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class=" col-md-5">
+                                                        <div class="form-group ">
+                                                            <div class="input-group ">
+                                                                <div class="input-group-btn">
+                                                                    <button class="btn" onclick="return false;">
+                                                                        Duration
+                                                                    </button>
+                                                                </div>
+                                                                <input class="form-control cabeControl" type="text" style="text-align: justify" disabled value="@item.duracion" id="txtDuracion" required="">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <div class="form-group ">
+                                                            <button type="button" onclick="modalApoyo(); return false;" class="btn btn-dark-blue btn-block">
+                                                                <i class="fa fa-cog"></i> Backing
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-5">
+                                                        <div class=" form-group">
+                                                            <div class="input-group">
+                                                                <div class="input-group-btn">
+                                                                    <button class="btn" onclick="return false;">
+                                                                        Score
+                                                                    </button>
+                                                                </div>
+                                                                <input class="form-control cabeControl" type="number" value="@item.ponderacion" disabled style="text-align: left" placeholder="0" onchange="controlPonderacion()" step="1" min="1" max="100" id="txtPonderacion" required="">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-7">
+                                                        <div class="form-group">
+                                                            <div class="input-group ">
+                                                                <div class="input-group-btn">
+                                                                    <button class="btn dropdown-toggle btnDrop" onclick="return false" data-toggle="">
+                                                                        Model
+                                                                        <span class="caret"></span>
+                                                                    </button>
+                                                                    <ul class="dropdown-menu pull-left">
+                                                                        @foreach (var itemTp in listTiposPre)
+                                                                        {
+                                                                            <li onclick="obtenerTipoPregunta(this)" class="liTipoPreg" data-idpregu="@itemTp.idTipo" id="@itemTp.idTipo" title="@itemTp.tipo">
+                                                                                <a href="" onclick="return false;">@itemTp.tipo</a>
+
+                                                                            </li>
+                                                                        }
+                                                                    </ul>
+                                                                </div>
+                                                                <input class="form-control noEdit" type="text" style="text-align:justify" disabled value="@item.objTipo.tipo" title="@item.objTipo.idTipo" id="txtTipoPreg" required="">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <div class="input-group">
+                                                                <div class=" input-group-btn">
+                                                                    <button class=" btn " onclick="return false;">
+                                                                        Instructions
+                                                                    </button>
+                                                                </div>
+                                                                <input class="form-control cabeControl" disabled value="@item.indicaciones" id="txtInstrucciones" type="text" required />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                            <!--fin formlario de cabeceraPregunta-->
+                                            <!--Inicio formlario de cuerpoPregunta-->
+                                            <form id="formPregCuer-@conPanel">
+                                                <input id="idPregunta" type="hidden" value="@item.idPregunta" />
+                                                @if (item.objTipo.idTipo == 1)
+                                                {
+                                                    <div class="row frmPreguntas" data-idpregunta="@item.idPregunta">
+                                                        <div class="col-lg-12">
+                                                            <p class="text-muted small" style="font-size:113%">
+                                                                <em>
+                                                                    <strong>Tip: </strong>
+                                                                </em>Type in quotation marks " " the words that are to be completed
+                                                            </p>
+                                                        </div>
+                                                        <div class="col-lg-12">
+                                                            <div class="checkbox" style="margin-top: 0px;">
+                                                                @if (item.mostarOpciones == true)
+                                                                {
+                                                                    <label>
+                                                                        <input disabled id="mostrarOp" type="checkbox" checked> Mostar opciones
+                                                                    </label>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <label>
+                                                                        <input disabled id="mostrarOp" type="checkbox"> Mostar opciones
+                                                                    </label>
+                                                                }
+
+                                                            </div>
+                                                        </div>
+                                                        <div id="literalesCom">
+                                                            @for (int i = 0; i < item.listaOpciones.Count; i++)
+                                                            {
+                                                                string oracionComp = item.listaOpciones[i].detallePregunta.Replace("_", "\"" + item.listaRespuesta[i].detalleRespuesta + "\"");
+                                                                int conLiteralComplete = i + 1;
+                                                                <div id="literalCom-@conLiteralComplete" class="col-md-6 form-group">
+                                                                    <div class="divComp input-group ">
+                                                                        <span class="input-group-addon">
+                                                                            <span class="fa fa-question " style="background-color: #DFF5F2"></span> / <span class="fa fa-edit " style="background-color: #DFF5F2"></span>
+                                                                        </span>
+                                                                        <input class="inpComp form-control" disabled value="@oracionComp" type="text">
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                        @if (ViewBag.IsEditable == 0)
+                                                        {
+                                                            <div id="divBotones">
+                                                                <div class="col-sm-offset-7 col-sm-5">
+                                                                    <div class="btn-group btn-group-justified">
+                                                                        <a class="btn btn-red" onclick="msgElimnarPregunta(); return false;" role="button">Remove question </a>
+                                                                        <a class="btn btn-blue" onclick="habilitarEdicion();return false;" role="button">Edit question</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
+
+                                                    </div>
+                                                }
+                                                @if (item.objTipo.idTipo == 2)
+                                                {
+                                                    <div class="row frmPreguntas" data-idpregunta="@item.idPregunta">
+                                                        <div id="literalesOrd">
+                                                            @for (int i = 0; i < item.listaOpciones.Count; i++)
+                                                            {
+                                                                int conLiteralOrdenar = i + 1;
+                                                            <div id="literalOrd-@conLiteralOrdenar">
+                                                                <div class="col-md-6 form-group">
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon">
+                                                                            <span class="fa fa-question " style="background-color: #DFF5F2"></span>
+                                                                        </span>
+                                                                        <input type="text" disabled class="form-control inputDesorde" value="@item.listaOpciones[i].detallePregunta">
+                                                                    </div>
+                                                                </div><div class="col-md-6 form-group">
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon">
+                                                                            <span class="fa fa-edit " style="background-color: #DFF5F2"></span>
+                                                                        </span>
+                                                                        <input type="text" disabled class="form-control inputOrde" value="@item.listaRespuesta[i].detalleRespuesta">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            }
+
+                                                        </div>
+                                                        @if (ViewBag.IsEditable == 0)
+                                                        {
+                                                        <div id="divBotones">
+                                                            <div class="col-sm-offset-7 col-sm-5">
+                                                                <div class="btn-group btn-group-justified">
+                                                                    <a class="btn btn-red" onclick="msgElimnarPregunta(); return false;" role="button">Remove question</a>
+                                                                    <a class="btn btn-blue" onclick="habilitarEdicion();return false;" role="button">Edit question</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        }
+                                                    </div>
+                                                }
+                                                @if (item.objTipo.idTipo == 3)
+                                                {
+                                                    <div class="row frmPreguntas" data-idpregunta="@item.idPregunta">
+                                                        <div id="literalesTra">
+                                                            @for (int i = 0; i < item.listaOpciones.Count; i++)
+                                                            {
+                                                                int conLiteralTradu = i + 1;
+                                                            <div id="literalTra-@conLiteralTradu">
+                                                                <div class="col-md-6 form-group">
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon">
+                                                                            <span class="fa fa-question " style="background-color: #DFF5F2"></span>
+                                                                        </span>
+                                                                        <input type="text" disabled class="form-control inputOriginal" value="@item.listaOpciones[i].detallePregunta">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6 form-group">
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon">
+                                                                            <span class="fa fa-edit " style="background-color: #DFF5F2"></span>
+                                                                        </span>
+                                                                        <input type="text" disabled class="form-control inputTradu" value="@item.listaRespuesta[i].detalleRespuesta">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            }
+                                                        </div>
+                                                        @if (ViewBag.IsEditable == 0)
+                                                        {
+                                                        <div id="divBotones">
+                                                            <div class="col-sm-offset-7 col-sm-5">
+                                                                <div class="btn-group btn-group-justified">
+                                                                    <a class="btn btn-red" onclick="msgElimnarPregunta(); return false;" role="button">Remove question</a>
+                                                                    <a class="btn btn-blue" onclick="habilitarEdicion();return false;" role="button">Edit question</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        }
+                                                    </div>
+                                                }
+                                                @if (item.objTipo.idTipo == 4)
+                                                {
+                                                    <div class="row frmPreguntas" data-idpregunta="@item.idPregunta">
+                                                        <div class="col-lg-12">
+                                                            <div class="checkbox" style="margin-top: 0px;">
+                                                                @if (item.mostarOpciones == true)
+                                                                {
+                                                                    <label>
+                                                                        <input disabled id="mostrarOp" type="checkbox" checked> Mostar opciones
+                                                                    </label>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <label>
+                                                                        <input disabled id="mostrarOp" type="checkbox"> Mostar opciones
+                                                                    </label>
+                                                                }
+
+                                                            </div>
+                                                        </div>
+                                                        <div id="literalesImg">
+                                                            @for (int i = 0; i < item.listaOpciones.Count; i++)
+                                                            {
+                                                                int conLiteralImg = i + 1;
+                                                                <div class="col-md-4" id="literalImg-@conLiteralImg">
+                                                                    <input style="display:none" name="files" value="@item.listaOpciones[i].detallePregunta" data-idopcion="@item.listaOpciones[i].idOpciones" type="file" class="inputImg" id="inputImag-@conLiteralImg" accept="image/*" onchange="fileMaxSize(this); readUrl(this); editarImg(this);">
+                                                                    <div class="portlet portlet-default">
+                                                                        <div class="portlet-body " style="text-align:center">
+                                                                            <button type="button" disabled class="tre" data-idimg="@conLiteralImg" onclick="cargarImg(this)">
+                                                                                <img id="blah-@conLiteralImg" style="height:170px" class="blah img-thumbnail" src="../img/imgActividad/@item.listaOpciones[i].detallePregunta">
+                                                                            </button>
+                                                                        </div>
+                                                                        <div class="portlet-footer">
+                                                                            <input type="text" disabled class="inputImgText form-control" id="txtImgOp-@conLiteralImg" data-idopcion="@item.listaOpciones[i].idOpciones" value="@item.listaRespuesta[i].detalleRespuesta" style="text-align: center; ">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            }
+
+                                                        </div>
+                                                        @if (ViewBag.IsEditable == 0)
+                                                        {
+                                                            <div id="divBotones">
+                                                                <div class="col-sm-offset-7 col-sm-5">
+                                                                    <div class="btn-group btn-group-justified">
+                                                                        <a class="btn btn-red" onclick="msgElimnarPregunta(); return false;" role="button">Remove question</a>
+                                                                        <a class="btn btn-blue" onclick="habilitarEdicion();return false;" role="button">Edit question</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                }
+                                                @if (item.objTipo.idTipo == 5)
+                                                {
+                                                    <div class="row frmPreguntas" data-idpregunta="@item.idPregunta">
+                                                        <div class="col-lg-12">
+                                                            <div class="dataTables_length" style="display:none">
+                                                                <label>Columns:</label>
+                                                                <select id="colum">
+                                                                    <option>2</option>
+                                                                    <option>3</option>
+                                                                    <option>4</option>
+                                                                    <option>5</option>
+                                                                </select>
+                                                                <label>&nbsp;Rows:</label>
+                                                                <select id="filas">
+                                                                    <option>2</option>
+                                                                    <option>3</option>
+                                                                    <option>4</option>
+                                                                    <option>5</option>
+                                                                </select>&nbsp;&nbsp;
+                                                                <input type="button" class=" btn btn-success" onclick="crearTablaDepen()" value="Crear Tabla">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-12" style="margin-top:1%">
+                                                            <div class="table-responsive">
+                                                                @{
+                                                    int res = item.listaRespuesta.Count;
+                                                    int opc = item.listaOpciones.Count;
+                                                    int filasTBody = res / opc;
+                                                                }
+                                                                <table id="tablaDependencia" class="table table-striped table-bordered table-hover table-green">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            @for (int i = 0; i < opc; i++)
+                                                                            {
+                                                                                <th>
+                                                                                    <input class="inputThead form-control" disabled value="@item.listaOpciones[i].detallePregunta" style="text-align: center;">
+                                                                                </th>
+                                                                            }
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @for (int i = 0; i < filasTBody; i++)
+                                                                        {
+                                                                            int con = i + 1;
+                                                                            <tr>
+
+                                                                                @for (int j = 0; j < opc; j++)
+                                                                                {
+                                                                                    if (con <= res)
+                                                                                    {
+                                                                                        <td>
+                                                                                            <input class="inputTbody form-control" disabled value="@item.listaRespuesta[con-1].detalleRespuesta" style="text-align: center;">
+                                                                                        </td>
+                                                                                    }
+
+                                                                                    con = con + filasTBody;
+                                                                                }
+                                                                            </tr>
+                                                                        }
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                        @if (ViewBag.IsEditable == 0)
+                                                        {
+                                                            <div id="divBotones">
+                                                                <div class="col-sm-offset-7 col-sm-5">
+                                                                    <div class="btn-group btn-group-justified">
+                                                                        <a class="btn btn-red" onclick="msgElimnarPregunta(); return false;" role="button">Remove question</a>
+                                                                        <a class="btn btn-blue" onclick="habilitarEdicion();return false;" role="button">Edit question</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                }
+                                                @if (item.objTipo.idTipo == 6)
+                                                {
+                                                    <div class="row frmPreguntas" data-idpregunta="@item.idPregunta">
+                                                        <div class="col-lg-12">
+                                                            <p class="text-muted" style="font-size:113%">
+                                                                <em><strong>Tip:</strong></em>Enter the opinions and check the ones that are correct
+                                                            </p>
+                                                        </div>
+                                                        <div id="literalesSel">
+                                                            @for (int i = 0; i < item.listaOpciones.Count; i++)
+                                                            {
+                                                                string litCheck = "";
+                                                                int conLiteralSel = i + 1;
+                                                                for (int j = 0; j < item.listaRespuesta.Count; j++)
+                                                                {
+                                                                    if (item.listaOpciones[i].detallePregunta == item.listaRespuesta[j].detalleRespuesta)
+                                                                    {
+                                                                        litCheck = "checked";
+                                                                        break;
+                                                                    }
+                                                                }
+                                                                <div id="literalSel-@conLiteralSel" class="col-md-6 form-group">
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon">
+                                                                            <input type="checkbox" @litCheck id="check-@conLiteralSel" disabled class="inputSelChk">
+                                                                        </span>
+                                                                        <input type="text" disabled class="form-control inputSel" value="@item.listaOpciones[i].detallePregunta">
+                                                                    </div>
+                                                                </div>
+                                                            }
+
+                                                        </div>
+                                                        @if (ViewBag.IsEditable == 0)
+                                                        {
+                                                            <div id="divBotones">
+                                                                <div class="col-sm-offset-7 col-sm-5">
+                                                                    <div class="btn-group btn-group-justified">
+                                                                        <a class="btn btn-red" onclick="msgElimnarPregunta(); return false;" role="button">Remove question</a>
+                                                                        <a class="btn btn-blue" onclick="habilitarEdicion();return false;" role="button">Edit question</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                }
+                                                @if (item.objTipo.idTipo == 7)
+                                                {
+                                                    <div class="row frmPreguntas" data-idpregunta="@item.idPregunta">
+                                                        @for (int i = 0; i < item.listaOpciones.Count; i++)
+                                                        {
+                                                            <div class="col-md-6 form-group">
+                                                                <div class="input-group">
+                                                                    <span class="input-group-addon">
+                                                                        <span class="fa fa-question " style="background-color: #DFF5F2"></span>
+                                                                    </span>
+                                                                    <input type="text" disabled value="@item.listaOpciones[i].detallePregunta" class="form-control inputIzq">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6 form-group">
+                                                                <div class="input-group">
+                                                                    <span class="input-group-addon">
+                                                                        <span class="fa fa-edit " style="background-color: #DFF5F2"></span>
+                                                                    </span>
+                                                                    <input type="text" disabled value="@item.listaRespuesta[i].detalleRespuesta" class="form-control inputDer">
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        @if (ViewBag.IsEditable == 0)
+                                                        {
+                                                            <div id="divBotones">
+                                                                <div class="col-sm-offset-7 col-sm-5">
+                                                                    <div class="btn-group btn-group-justified">
+                                                                        <a class="btn btn-red" onclick="msgElimnarPregunta(); return false;" role="button">Remove question</a>
+                                                                        <a class="btn btn-blue" onclick="habilitarEdicion();return false;" role="button">Edit question</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                }
+                                            </form>
+                                            <!--fin formlario de cuerpoPregunta-->
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+                            <!--end panel de cada pregunta-->
+                        </div>
+                    </div>
+                </div>
+                <!-- /.portlet-body -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var apoyosDisponibles = new Array();
+</script>
+
+<div id="allModals">
+    @foreach (var item in Model)
+    {
+        contadorApoyo++;
+        if (item.objApoyo != null)
+        {
+            if (item.objApoyo.idApoyo != 0)
+            {
+                <script>
+                    var objApoyos = { "idApoyo": '@item.objApoyo.idApoyo', "titulo": '@item.objApoyo.titulo' }
+                    apoyosDisponibles.push(objApoyos);
+                </script>
+                <div class="modal fade" id="modalApoyo-@contadorApoyo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+                    <div class="modal-dialog" style="width:45%" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header bg-darrk-blue-o">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                                <h4 class="modal-title">Backing:</h4>
+                            </div>
+                            <div class="modal-body">
+                                <input id="queApoyo" type="hidden" value="0">
+                                <form id="botonSeleccione">
+                                    <div class="row">
+                                        <div class=" col-lg-12">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-sm-4">
+                                                        <button type="button" onclick="crearApoyo(); return false" class="btn btn-success btn-block">
+                                                            <span class="fa fa-plus"></span>&nbsp;Create new backing
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <button type="button" onclick="asignarApoyo(); return false" class="btn btn-blue btn-block">
+                                                            <span class="fa fa-refresh"></span>&nbsp;Reuse a backing
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <button type="button" onclick="msgElimnarApoyo(); return false" class="btn btn-red btn-block">
+                                                            <span class="fa fa-trash-o"></span>&nbsp;Delete backing
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                                <div id="formNuevoApoyo">
+                                    <form id="apoyo-@item.objApoyo.idApoyo" method="post" enctype="multipart/form-data">
+                                        <input id="apoyoId" type="hidden" value="@item.objApoyo.idApoyo" />
+                                        <div class="row">
+                                            <div class=" col-lg-12">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label for="textInput" class="col-sm-1 control-label">Title: &nbsp;</label>
+                                                        <div class="col-sm-11">
+                                                            <input disabled type="text" onchange="apoyoChange()" class="form-control apoyoControl" value="@item.objApoyo.titulo" id="inputApoyoTitulo">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @{ string isCheck = "checked";}
+                                                <div class="form-group">
+                                                    <div class="checkbox">
+                                                        @if (item.objApoyo.enunciado == "")
+                                                        {
+                                                            isCheck = "";
+                                                        }
+                                                        else
+                                                        {
+                                                            isCheck = "checked";
+                                                        }
+                                                        <label>
+                                                            <input disabled @isCheck class="checkApoyo" type="checkbox" id="checkApoyoTexto" onclick="modalControls()"> Text
+                                                        </label>
+                                                    </div>
+                                                    <textarea id="inputApoyoTexto" onchange="apoyoChange()" class="form-control apoyoControl" style="resize:none;height: 15%" disabled="">@item.objApoyo.enunciado</textarea>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="checkbox ">
+                                                        @if (item.objApoyo.imagen == "")
+                                                        {
+                                                            isCheck = "";
+                                                        }
+                                                        else
+                                                        {
+                                                            isCheck = "checked";
+                                                        }
+                                                        <label>
+                                                            <input @isCheck disabled class="checkApoyo" type="checkbox" id="checkApoyoImg" onclick="modalControls()">
+                                                            Image
+                                                        </label>
+                                                    </div>
+                                                    <input type="file" accept="image/*" onchange="fileMaxSize(this); apoyoChange()" id="inputApoyoImg" class="form-control apoyoControl" disabled="">
+                                                    @if (item.objApoyo.imagen != "")
+                                                    {
+                                                        <button type="button" disabled class="" data-idimg="" onclick="">
+                                                            <img id="inputApoyoImgImg" class="blah img-thumbnail" src="../img/imgApoyo/@item.objApoyo.imagen">
+                                                        </button>
+                                                    }
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <div class="checkbox ">
+                                                        <label>
+                                                            @if (item.objApoyo.link == "")
+                                                            {
+                                                                isCheck = "";
+                                                            }
+                                                            else
+                                                            {
+                                                                isCheck = "checked";
+                                                            }
+                                                            <input @isCheck class="checkApoyo" type="checkbox" id="checkApoyoLink" disabled onclick="modalControls()"> Insert video
+                                                        </label>
+                                                    </div>
+                                                    <input type="url" id="inputApoyolink" onchange="apoyoChange()" value="@item.objApoyo.link" class="form-control apoyoControl" disabled="">
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="checkbox ">
+                                                        <label>
+                                                            @if (item.objApoyo.audio == "")
+                                                            {
+                                                                isCheck = "";
+                                                            }
+                                                            else
+                                                            {
+                                                                isCheck = "checked";
+                                                            }
+                                                            <input @isCheck class="checkApoyo" type="checkbox" id="checkApoyoAudio" disabled onclick="modalControls()"> Insert audio
+                                                        </label>
+                                                    </div>
+                                                    <input type="file" id="inputApoyoAudio" accept="audio/*" data-max="3072" onchange="fileMaxSize(this); apoyoChange()" class="form-control apoyoControl" disabled="">
+                                                    @if (item.objApoyo.audio != "")
+                                                    {
+                                                        <audio id="inputApoyoAudioAudio" src="../img/audioApoyo/@item.objApoyo.audio" controls></audio>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <form id="formUsarApoyo" style="display: none;">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">Choose backing: &nbsp;</label>
+                                                <div class="col-sm-9">
+                                                    <select onchange="apoyoSelect(this)" id="selectUsarApoyo" class="form-group">
+                                                        <option selected="">Choose</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+
+    }
+</div>
+
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalGif" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:60%" role="document">
+        <div id="contenedor">
+            <div class="loader" id="loader">Loading...</div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ajaxStart(function () {
+        $("#modalGif").modal('show');
+    });
+    $(document).ajaxStop(function () {
+        $("#modalGif").modal('hide');
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+    });
+
+    $(document).ready(function () {
+        if ('@ViewBag.IsEditable' != 0) {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'This activity can not be edited',
+                type: 'info',
+                hideAfter: 5,
+                showCloseButton: false
+            });
+        }
+    });
+    var currentQ = 1;
+    var arrayApoyos = [];
+    var contadorPregunta = '@contadorPregu';
+    var ponderacionSuma = '@contadorPonderacion';
+    function nuevaPregunta() {
+        if (ponderacionSuma >= 100) {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'You can not create more questions. Qualification of 100 already achieved.',
+                type: 'error',
+                hideAfter: 3,
+                showCloseButton: false
+            });
+            return false;
+        }
+        etiquetaPre = document.getElementById("pregunta-" + contadorPregunta);
+        panelPregunta = document.getElementById("tab-pregunta-" + contadorPregunta);
+        contadorPregunta++;
+        etiquetaPre.insertAdjacentHTML("afterend", '<li class="liBryan" id="pregunta-' + contadorPregunta + '"><a href="#tab-pregunta-' + contadorPregunta + '" onclick="currentQue(this)" id="nP-' + contadorPregunta + '" data-mynumber="' + contadorPregunta + '" data-toggle="tab">Question ' + contadorPregunta + '</a></li>');
+        panelPregunta.insertAdjacentHTML("afterend", '<div class="tab-pane fade" id="tab-pregunta-' + contadorPregunta + '">' + frmPrgCP() + '</div>');
+        $("#nP-" + contadorPregunta).click();
+        document.getElementById("formPregCuer-" + currentQ).insertAdjacentHTML("afterbegin", allTP[0]);
+    }
+    function currentQue(cQ) {
+        currentQ = cQ.dataset.mynumber;
+    }
+    function destrezaSltd(dS) {
+        var desSel = dS.title;
+        $("#formPregCabe-" + currentQ).find("#txtDestreza:input").val(desSel);
+    }
+    function nivelActivi(nivel) {
+        var idNivel = nivel.title;
+        $("#txtNivel:input").val(idNivel);
+    }
+    function obtenerTipoPregunta(tS) {
+        var tipoSel = tS.title;
+        currentTP = tS.id;
+        $("#formPregCabe-" + currentQ).find("#txtTipoPreg:input").val(tipoSel);
+        $("#formPregCabe-" + currentQ).find("#txtTipoPreg:input").attr("title", currentTP);
+        $("#formPregCuer-" + currentQ).find(".frmPreguntas").remove();
+        document.getElementById("formPregCuer-" + currentQ).insertAdjacentHTML("afterbegin", allTP[currentTP - 1]);
+        if (currentTP == 4) {
+            var obj = {
+                idInputImg: "inputImag-1",
+                idOpcion: 0,
+                numLite: 1,
+                numQue: currentQ
+            };
+            arrayImg.push(obj);
+        }
+    }
+    var actividadEditada = false;
+    function editarCabeActi() {
+        actividadEditada = true;
+    }
+    function habilitarEdicion() {
+        var tipoPre = $("#formPregCabe-" + currentQ).find('#txtTipoPreg').attr("title");
+        $("#formPregCabe-" + currentQ).find('input, textarea, button, select,a').removeAttr('disabled');
+        $("#formPregCabe-" + currentQ).find('.noEdit').attr('disabled', 'disabled').css("background-color", "#fff");
+        $("#formPregCabe-" + currentQ).find('.btnDrop').attr('data-toggle', "dropdown");
+        $("#formPregCuer-" + currentQ).find('input, textarea, button, select,a').removeAttr('disabled');
+        if ($("#modalApoyo-" + currentQ).length > 0) {
+            habiitarEdicionApoyo();
+        }
+        switch (tipoPre) {
+            case '5':
+                $("#formPregCuer-" + currentQ).find(".dataTables_length").show();
+                $("#formPregCuer-" + currentQ).find("#divBotones").children().remove();
+                $("#formPregCuer-" + currentQ).find("#divBotones").append('<div class="col-sm-offset-9 col-sm-3"><div class="form-group "><a class="btn btn-success btn-block" onclick=" guardarPregunta()" role="button">'
+                    + '<span class="fa fa-save"></span> &nbsp;Save</a></div></div>');
+                break;
+            case '7':
+                $("#formPregCuer-" + currentQ).find("#divBotones").children().remove();
+                $("#formPregCuer-" + currentQ).find("#divBotones").append('<div class="col-sm-offset-9 col-sm-3"><div class="form-group "><a class="btn btn-success btn-block" onclick=" guardarPregunta()" role="button">'
+                    + '<span class="fa fa-save"></span> &nbsp;Save</a></div></div>');
+                break;
+            default:
+
+                $("#formPregCuer-" + currentQ).find("#divBotones").children().remove();
+                $("#formPregCuer-" + currentQ).find("#divBotones").append(botones2);
+                break;
+        }
+    }
+    function habiitarEdicionApoyo() {
+        $("#modalApoyo-" + currentQ).find("#inputApoyoTitulo").removeAttr("disabled");
+        $("#modalApoyo-" + currentQ).find(".checkApoyo").removeAttr("disabled");
+        if ($("#modalApoyo-" + currentQ).find("#checkApoyoTexto").is(":checked")) {
+            $("#modalApoyo-" + currentQ).find("#inputApoyoTexto").removeAttr("disabled");
+        }
+        if ($("#modalApoyo-" + currentQ).find("#checkApoyoImg").is(":checked")) {
+            $("#modalApoyo-" + currentQ).find("#inputApoyoImg").removeAttr("disabled");
+        }
+        if ($("#modalApoyo-" + currentQ).find("#checkApoyoLink").is(":checked")) {
+            $("#modalApoyo-" + currentQ).find("#inputApoyolink").removeAttr("disabled");
+        }
+        if ($("#modalApoyo-" + currentQ).find("#checkApoyoAudio").is(":checked")) {
+            $("#modalApoyo-" + currentQ).find("#inputApoyoAudio").removeAttr("disabled");
+        }
+    }
+    function modalControls() {
+        if ($("#modalApoyo-" + currentQ).find("#checkApoyoTexto").is(":checked")) {
+            $("#modalApoyo-" + currentQ).find("#inputApoyoTexto").removeAttr("disabled").prop("required", true);
+        }
+        if ($("#modalApoyo-" + currentQ).find("#checkApoyoTexto").is(":not(:checked)")) {
+            $("#modalApoyo-" + currentQ).find("#inputApoyoTexto").prop("disabled", "true").removeAttr("style").css("resize", "none");
+        }
+
+        if ($("#modalApoyo-" + currentQ).find("#checkApoyoImg").is(":checked")) {
+            $("#modalApoyo-" + currentQ).find("#inputApoyoImg").removeAttr("disabled").prop("required", true);
+        }
+        if ($("#modalApoyo-" + currentQ).find("#checkApoyoImg").is(":not(:checked)")) {
+            $("#modalApoyo-" + currentQ).find("#inputApoyoImg").prop("disabled", "true").removeAttr("style").css("resize", "none");
+        }
+
+        if ($("#modalApoyo-" + currentQ).find("#checkApoyoLink").is(":checked")) {
+            $("#modalApoyo-" + currentQ).find("#inputApoyolink").removeAttr("disabled").prop("required", true);
+        }
+        if ($("#modalApoyo-" + currentQ).find("#checkApoyoLink").is(":not(:checked)")) {
+            $("#modalApoyo-" + currentQ).find("#inputApoyolink").prop("disabled", "true").removeAttr("style").css("resize", "none");
+        }
+        if ($("#modalApoyo-" + currentQ).find("#checkApoyoAudio").is(":checked")) {
+            $("#modalApoyo-" + currentQ).find("#inputApoyoAudio").removeAttr("disabled").prop("required", true);
+        }
+        if ($("#modalApoyo-" + currentQ).find("#checkApoyoAudio").is(":not(:checked)")) {
+            $("#modalApoyo-" + currentQ).find("#inputApoyoAudio").prop("disabled", "true").removeAttr("style").css("resize", "none");
+        }
+    }
+    var apoyoEditado = false;
+    function apoyoChange() {
+        apoyoEditado = true;
+    }
+    function editarActividad() {
+        var cabeActiv = {
+            idActividad: $("#idAct").val(),
+            descripcion: $('#temaAct').val(),
+            idNivel: $('#txtNivel').val(),
+        }
+        $.ajax({
+            url: "../Docente/editarActividad",
+            type: 'POST',
+            data: JSON.stringify(cabeActiv),
+            dataType: 'json',
+            contentType: "application/json",
+            success: function (data) {
+            }
+        });
+    }
+    function enviarPreguntaControlador(listasOcp, listasRes) {
+        if (ponderacionSuma > 100) {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'Maximum score of the exceeded activity: (' + ponderacionSuma + '). Please correct',
+                type: 'error',
+                hideAfter: 3,
+                showCloseButton: false
+            });
+            return false;
+        }
+        if (actividadEditada) {
+            editarActividad();
+        }
+        var _pregunta = new FormData();
+
+        if ($("#modalApoyo-" + currentQ).length > 0) {
+            if ($("#formPregCuer-" + currentQ).find("#idPregunta").val() == "0") {
+                if ($("#modalApoyo-" + currentQ).find("#queApoyo").val() != "0" && $("#modalApoyo-" + currentQ).find("#queApoyo").val() != "-1") {
+                    _pregunta.append("modelApoyo.idApoyo", $("#modalApoyo-" + currentQ).find("#queApoyo").val());
+                }
+                else {
+                    if (apoyoVacio() == 0) {
+                        return false
+                    }
+                    _pregunta.append("modelApoyo.titulo", $("#modalApoyo-" + currentQ).find("#inputApoyoTitulo").val());
+                    _pregunta.append("modelApoyo.enunciado", $("#modalApoyo-" + currentQ).find("#inputApoyoTexto").val());
+                    _pregunta.append("modelApoyo.link", $("#modalApoyo-" + currentQ).find("#inputApoyolink").val());
+                    _pregunta.append("modelApoyo.imagenImagen", $("#modalApoyo-" + currentQ).find("#inputApoyoImg").prop('files')[0]);
+                    _pregunta.append("modelApoyo.audioAudio", $("#modalApoyo-" + currentQ).find("#inputApoyoAudio").prop('files')[0]);
+                }
+            }
+            else if ($("#modalApoyo-" + currentQ).find("#queApoyo").val() != "0" && $("#modalApoyo-" + currentQ).find("#queApoyo").val() != "-1") {
+                _pregunta.append("modelApoyo.idApoyo", $("#modalApoyo-" + currentQ).find("#queApoyo").val());
+            }
+            else {
+                var idApoyo = $("#modalApoyo-" + currentQ).find("#apoyoId").val();
+                if (idApoyo == "0") {
+                    if (apoyoVacio() == 0) {
+                        return false
+                    }
+                    _pregunta.append("modelApoyo.titulo", $("#modalApoyo-" + currentQ).find("#inputApoyoTitulo").val());
+                    _pregunta.append("modelApoyo.enunciado", $("#modalApoyo-" + currentQ).find("#inputApoyoTexto").val());
+                    _pregunta.append("modelApoyo.link", $("#modalApoyo-" + currentQ).find("#inputApoyolink").val());
+                    _pregunta.append("modelApoyo.imagenImagen", $("#modalApoyo-" + currentQ).find("#inputApoyoImg").prop('files')[0]);
+                    _pregunta.append("modelApoyo.audioAudio", $("#modalApoyo-" + currentQ).find("#inputApoyoAudio").prop('files')[0]);
+                }
+                else {
+                    _pregunta.append("modelApoyo.idApoyo", $("#modalApoyo-" + currentQ).find("#apoyoId").val());
+                    if (apoyoEditado) {
+                        if (apoyoVacio() == 0) {
+                            return false
+                        }
+                        _pregunta.append("modelApoyo.titulo", $("#modalApoyo-" + currentQ).find("#inputApoyoTitulo").val());
+                        _pregunta.append("modelApoyo.enunciado", $("#modalApoyo-" + currentQ).find("#inputApoyoTexto").val());
+                        _pregunta.append("modelApoyo.link", $("#modalApoyo-" + currentQ).find("#inputApoyolink").val());
+                        if ($("#modalApoyo-" + currentQ).find("#inputApoyoImg").val() != "") {
+                            _pregunta.append("modelApoyo.imagenImagen", $("#modalApoyo-" + currentQ).find("#inputApoyoImg").prop('files')[0]);
+                        }
+                        else if ($("#modalApoyo-" + currentQ).find("#inputApoyoImgImg").attr("src") != undefined) {
+                            var imgName = $("#modalApoyo-" + currentQ).find("#inputApoyoImgImg").attr("src");
+                            alert(imgName);
+                            imgName = imgName.substr(16);
+                            alert(imgName);
+                            _pregunta.append("modelApoyo.imagen", imgName);
+                        }
+                        if ($("#modalApoyo-" + currentQ).find("#inputApoyoAudio").val() != "") {
+                            _pregunta.append("modelApoyo.audioAudio", $("#modalApoyo-" + currentQ).find("#inputApoyoAudio").prop('files')[0]);
+                        }
+                        else if ($("#modalApoyo-" + currentQ).find("#inputApoyoAudioAudio").attr("src") != undefined) {
+                            var audioName = $("#modalApoyo-" + currentQ).find("#inputApoyoAudioAudio").attr("src");
+                            audioName = audioName.substr(18);
+                            _pregunta.append("modelApoyo.audio", audioName);
+                        }
+                    }
+                }
+            }
+        }
+        if ($("#formPregCabe-" + currentQ).find("#txtTipoPreg").attr("title") == 4) {
+            for (var i = 0; i < arrayImg.length; i++) {
+                if (currentQ == arrayImg[i].numQue) {
+                    _pregunta.append("files", $("#formPregCuer-" + currentQ).find("#" + arrayImg[i].idInputImg).prop('files')[0]);
+                    _pregunta.append("idOpcionImg", arrayImg[i].idOpcion);
+                }
+            }
+
+        }
+
+        var ponderacion = $("#formPregCabe-" + currentQ).find("#txtPonderacion").val().replace(".", ",");
+        _pregunta.append("modelPregunta.destreza", $("#formPregCabe-" + currentQ).find("#txtDestreza").val());
+        _pregunta.append("modelPregunta.duracion", $("#formPregCabe-" + currentQ).find("#txtDuracion").val());
+        _pregunta.append("modelPregunta.ponderacion", ponderacion);
+        _pregunta.append("modelPregunta.idTipo", $("#formPregCabe-" + currentQ).find("#txtTipoPreg").attr("title"));
+        _pregunta.append("modelPregunta.indicaciones", $("#formPregCabe-" + currentQ).find("#txtInstrucciones").val());
+        _pregunta.append("modelPregunta.idActividad", $("#idAct").val());
+        _pregunta.append("modelPregunta.idPregunta", $("#formPregCuer-" + currentQ).find("#idPregunta").val());
+        for (var i = 0; i < listasOcp.length; i++) {
+            _pregunta.append("modelListaOpciones", listasOcp[i]);
+        }
+        for (var i = 0; i < listasRes.length; i++) {
+            _pregunta.append("modelListaRespuesta", listasRes[i]);
+        }
+
+        if ($("#formPregCabe-" + currentQ).find("#txtTipoPreg").attr("title") == 4 || $("#formPregCabe-" + currentQ).find("#txtTipoPreg").attr("title") == 1) {
+            if ($("#formPregCuer-" + currentQ).find("#mostrarOp").is(":checked")) {
+                _pregunta.append("modelPregunta.mostarOpciones", $("#formPregCuer-" + currentQ).find("#mostrarOp").is(":checked"));
+            }
+        }
+
+        var urlAction = "../Docente/editarPregunta";
+        if ($("#formPregCuer-" + currentQ).find("#idPregunta").val() == "0") {
+            urlAction = "../Docente/guardarPregunta";
+        }
+        if (($("#formPregCabe-" + currentQ).find("#txtTipoPreg").attr("title") == 4) && $("#formPregCuer-" + currentQ).find("#idPregunta").val() != "0") {
+            urlAction = "../Docente/editarPreguntaImg";
+        }
+        $.ajax({
+            url: urlAction,
+            type: 'POST',
+            data: _pregunta,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                bloquearPregunta();
+                $("#formPregCuer-" + currentQ).find("#idPregunta").val(data.ipPre);
+                if (data.idApo) {
+                    var objApoyos1 = { "idApoyo": data.idApo, "titulo": $("#modalApoyo-" + currentQ).find("#inputApoyoTitulo").val() }
+                    apoyosDisponibles.push(objApoyos1);
+                    $("#modalApoyo-" + currentQ).find("#apoyoId").val(data.idApo);
+                }
+
+                Messenger.options = {
+                    extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                    theme: 'flat'
+                }
+                Messenger().post({
+                    message: 'Question edited successfully!',
+                    type: 'success',
+                    hideAfter: 3,
+                    showCloseButton: false
+                });
+                if ($("#formPregCabe-" + currentQ).find("#txtTipoPreg").attr("title") == 4) {
+                    var arrarToDe = new Array();
+                    var con = 0;
+                    for (var i = 0; i < arrayImg.length; i++) {
+                        if (currentQ == arrayImg[i].numQue) {
+                            $("#formPregCuer-" + currentQ).find("#" + arrayImg[i].idInputImg).attr("data-idopcion", data.arrayOpc[con]);
+                            arrarToDe.push(i);
+                            delete arrayImg[i];
+                            con++;
+                        }
+                    }
+                    quitarIndicesArrayImg(arrarToDe);
+                }
+            }
+        });
+    }
+    function quitarIndicesArrayImg(array) {
+        array.reverse();
+        for (var i = 0; i < array.length; i++) {
+            arrayImg.splice(array[i], 1);
+        }
+    }
+    function bloquearPregunta() {
+        $("#formPregCabe-" + currentQ).find('input, textarea, button, select').attr('disabled', 'disabled');
+        $("#formPregCuer-" + currentQ).find('input, textarea, button, select,a').attr('disabled', 'disabled');
+        $("#formPregCuer-" + currentQ).find('#divBotones').html('<div class="col-sm-offset-7 col-sm-5"><div class="btn-group btn-group-justified">'
+            + '<a class="btn btn-red" onclick="msgElimnarPregunta();return false;" role="button">Remove question </a>'
+            + '<a class="btn btn-blue" onclick="habilitarEdicion();return false;" role="button">Edit question</a>'
+            + '</div></div>');
+    }
+
+    function msgElimnarApoyo() {
+        Messenger.options = {
+            extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+            theme: 'flat'
+        }
+        msg = Messenger().post({
+            message: 'Are you sure?',
+            actions: {
+                delete: {
+                    label: "Delete",
+                    action: function () {
+                        msg.hide();
+                        quitarApoyoActi()
+                    }
+                },
+
+                cancel: {
+                    action: function () {
+                        msg.hide();
+                        return false;
+                    }
+                }
+            }
+        });
+    }
+
+    function quitarApoyoActi() {
+        var idApoyo = $("#modalApoyo-" + currentQ).find("#apoyoId").val();
+        var idActi = $("#idAct").val();
+        var idPreg = $("#formPregCuer-" + currentQ).find("#idPregunta").val();
+        if (idApoyo == "0") {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'This question does not have backing',
+                type: 'error',
+                hideAfter: 3,
+                showCloseButton: false
+            });
+            return false;
+        }
+        $.ajax({
+            url: "../Docente/eliminarApoyo",
+            type: "POST",
+            data: JSON.stringify({ _idApoyo: idApoyo, _idActividad: idActi, _idPregunta: idPreg }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (result) {
+                if (result == "Deleted") {
+                    for (var i = 0; i < apoyosDisponibles.length; i++) {
+                        if (apoyosDisponibles[i].idApoyo == idApoyo) {
+                            apoyosDisponibles.splice(i, 1);
+                        }
+                    }
+                }
+                $("#modalApoyo-" + currentQ).modal('hide');
+                $("#modalApoyo-" + currentQ).remove();
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+                Messenger.options = {
+                    extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                    theme: 'flat'
+                }
+                Messenger().post({
+                    message: 'Backing deleted',
+                    type: 'error',
+                    hideAfter: 3,
+                    showCloseButton: false
+                });
+            }
+        });
+    }
+
+    function apoyoVacio() {
+
+        if (($("#modalApoyo-" + currentQ).find("#checkApoyoTexto").is(":checked") || $("#modalApoyo-" + currentQ).find("#checkApoyoImg").is(":checked") || $("#modalApoyo-" + currentQ).find("#checkApoyoLink").is(":checked") || $("#modalApoyo-" + currentQ).find("#checkApoyoAudio").is(":checked")) && $("#modalApoyo-" + currentQ).find("#inputApoyoTitulo").val() == "") {
+            alertaApoyoCampoVacio();
+            return 0;
+        }
+        if ($("#modalApoyo-" + currentQ).find("#checkApoyoTexto").is(":checked") && $("#modalApoyo-" + currentQ).find("#inputApoyoTexto").val() == "") {
+            alertaApoyoCampoVacio();
+            return 0;
+        }
+        if ($("#modalApoyo-" + currentQ).find("#checkApoyoImg").is(":checked") && $("#modalApoyo-" + currentQ).find("#inputApoyoImg").val() == "") {
+            if ($("#modalApoyo-" + currentQ).find("#inputApoyoImgImg").length == 0) {
+                alertaApoyoCampoVacio();
+
+            }
+            return 0;
+        }
+        if ($("#modalApoyo-" + currentQ).find("#checkApoyoLink").is(":checked") && $("#modalApoyo-" + currentQ).find("#inputApoyolink").val() == "") {
+            alertaApoyoCampoVacio();
+            return 0;
+        }
+        if ($("#modalApoyo-" + currentQ).find("#checkApoyoAudio").is(":checked") && $("#modalApoyo" + currentQ).find("#inputApoyoAudio").val() == "") {
+            alertaApoyoCampoVacio();
+            return 0;
+        }
+    }
+    function alertaApoyoCampoVacio() {
+        Messenger.options = {
+            extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+            theme: 'flat'
+        }
+        Messenger().post({
+            message: 'Empty field in backing of activity',
+            type: 'error',
+            hideAfter: 3,
+            showCloseButton: false
+        });
+        return 0;
+    }
+    function destrezaApoyo() {
+        var destreSelec = $("#formPregCabe-" + currentQ).find("#txtDestreza").val();
+        if (destreSelec == 'Listening') {
+            if ($("#modalApoyo-" + currentQ).length == 0) {
+                alertaFaltaApoyo(1);
+                return 0;
+            }
+            if (!($("#modalApoyo-" + currentQ).find("#inputApoyolink").val() != "" || $("#modalApoyo-" + currentQ).find("#inputApoyoAudio").val() != "")) {
+                alertaFaltaApoyo(1);
+                return 0;
+            }
+        }
+        if (destreSelec == 'Reading') {
+            if ($("#modalApoyo-" + currentQ).length == 0) {
+                alertaFaltaApoyo(2);
+                return 0;
+            }
+            if ($("#modalApoyo-" + currentQ).find("#inputApoyoTexto").val() == "") {
+                alertaFaltaApoyo(2);
+                return 0;
+            }
+        }
+    }
+    function alertaFaltaApoyo(num) {
+        if (num == 1) {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'Listening questions should have an audio or video link backing',
+                type: 'error',
+                hideAfter: 3,
+                showCloseButton: false
+            });
+        }
+        if (num == 2) {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'reading questions must have text backing',
+                type: 'error',
+                hideAfter: 3,
+                showCloseButton: false
+            });
+        }
+
+    }
+    function guardarPregunta() {
+        var pass;
+        $("#formPregCabe-" + currentQ).find(".cabeControl").each(function () {
+            if ($(this).val() == "") {
+                alertaCampoVacio();
+                $(this).css("border", "2px solid red").focus();
+                pass = false;
+                return false;
+            }
+            $(this).removeAttr("style");
+        });
+        if (pass != false) {
+            if (destrezaApoyo() == 0) {
+                return false;
+            }
+            var tP = $("#formPregCabe-" + currentQ).find("#txtTipoPreg:input");
+            self["obtener" + $("#formPregCabe-" + currentQ).find("#txtTipoPreg:input").attr("title")]();
+
+        }
+    }
+    function msgElimnarPregunta() {
+        Messenger.options = {
+            extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+            theme: 'flat'
+        }
+        msg = Messenger().post({
+            message: 'Are you sure?',
+            actions: {
+                delete: {
+                    label: "Delete",
+                    action: function () {
+                        msg.hide();
+                        eliminarPregunta()
+                    }
+                },
+
+                cancel: {
+                    action: function () {
+                        msg.hide();
+                        return false;
+                    }
+                }
+            }
+        });
+    }
+
+
+    function eliminarPregunta() {
+        var _pregunta = new FormData();
+        if (contadorPregunta == 1) {
+            msgElimnarUlPregunta();
+            return false;
+        }
+        if ($("#modalApoyo-" + currentQ).length > 0) {
+            if ($("#modalApoyo-" + currentQ).find("#apoyoId").val() != 0) {
+                _pregunta.append("modelApoyo.idApoyo", $("#modalApoyo-" + currentQ).find("#apoyoId").val());
+            }
+        }
+
+        var ponderacion = $("#formPregCabe-" + currentQ).find("#txtPonderacion").val().replace(".", ",");
+        _pregunta.append("modelPregunta.duracion", $("#formPregCabe-" + currentQ).find("#txtDuracion").val());
+        _pregunta.append("modelPregunta.idActividad", $("#idAct").val());
+        _pregunta.append("modelPregunta.idPregunta", $("#formPregCuer-" + currentQ).find("#idPregunta").val());
+
+        $.ajax({
+            url: "../Docente/eliminarPregunta",
+            type: 'POST',
+            data: _pregunta,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                ponderacionSuma = ponderacionSuma - ponderacion;
+                quitarPreguntaEliminada();
+                actualizarIndices();
+                $("#nP-" + contadorPregunta).click();
+                Messenger.options = {
+                    extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                    theme: 'flat'
+                }
+                Messenger().post({
+                    message: 'Question removed!',
+                    type: 'success',
+                    hideAfter: 3,
+                    showCloseButton: false
+                });
+            }
+        });
+    }
+    function msgElimnarUlPregunta() {
+        Messenger.options = {
+            extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+            theme: 'flat'
+        }
+        msg = Messenger().post({
+            message: 'Are you sure? This is the only question, if you remove it, it also eliminates the activity.',
+            actions: {
+                delete: {
+                    label: "Delete",
+                    action: function () {
+                        msg.hide();
+                        eliminarUltimaPregunta()
+                    }
+                },
+
+                cancel: {
+                    action: function () {
+                        msg.hide();
+                        return false;
+                    }
+                }
+            }
+        });
+    }
+
+    function eliminarUltimaPregunta() {
+        var idActividad = $("#idAct").val();
+        $.ajax({
+            url: "../Docente/eliminarActividad",
+            type: 'POST',
+            data: JSON.stringify({ _idActividad: idActividad }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (data) {
+                location.href = '../Docente/verActividadesDocente';
+            }
+        });
+    }
+    function quitarPreguntaEliminada() {
+        $("#tab-pregunta-" + currentQ).remove();
+        $("#pregunta-" + currentQ).remove();
+    }
+    function actualizarIndices() {
+        for (var i = parseInt(currentQ) + 1; i <= contadorPregunta; i++) {
+            var indi = i - 1;
+            $("#pregunta-" + i).attr("id", "pregunta-" + indi);
+            $("#nP-" + i).attr({ "href": "#tab-pregunta-" + indi, "data-mynumber": indi });
+            $("#nP-" + i).html("Pregunta " + indi);
+            $("#nP-" + i).attr("id", "nP-" + indi);
+            $("#tab-pregunta-" + i).attr("id", "tab-pregunta-" + indi);
+            $("#formPregCabe-" + i).attr("id", "formPregCabe-" + indi);
+            $("#formPregCuer-" + i).attr("id", "formPregCuer-" + indi);
+        }
+        contadorPregunta--;
+    }
+
+    //funciones para la obtencion de las preguntas, segun su tipo
+    //el numero representa el tipo de pregunta
+    function obtener1() {
+        var arrayOpc = new Array();
+        var arrayRes = new Array();
+        var pass;
+        $("#formPregCuer-" + currentQ).find(".inpComp").each(function (i) {
+            var oracion = $(this).val();
+            if (oracion != "") {
+                var pos1 = oracion.indexOf('"');
+                var pos2 = oracion.lastIndexOf('"');
+                if ((pos1 != -1 && pos1 != pos2) && pos1 + 1 != pos2) {
+                    $(this).removeAttr('style');
+                    var txtSacado = oracion.substring(pos1, pos2 + 1);
+                    arrayRes[i] = txtSacado.substring(1, txtSacado.length - 1);
+                    var texP1 = oracion.substring(0, pos1);
+                    var texP2 = oracion.substring(pos2 + 1, oracion.length);
+                    arrayOpc[i] = texP1 + '_' + texP2;
+                }
+                else {
+                    pass = false;
+                    $(this).css("border", "2px solid red").focus();
+                    Messenger.options = {
+                        extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                        theme: 'flat'
+                    }
+                    Messenger().post({
+                        message: 'The words to complete must be enclosed in quotation marks " "',
+                        type: 'error',
+                        hideAfter: 3,
+                        showCloseButton: false
+                    });
+                    return false
+                }
+            }
+            else {
+                pass = false;
+                $(this).css("border", "2px solid red").focus();
+                alertaCampoVacio();
+                return false;
+            }
+        });
+        if (pass != false) {
+            //aqui retorno los array
+            enviarPreguntaControlador(arrayOpc, arrayRes);
+        }
+    }
+    function obtener2() {
+        var arrayOpc = new Array();
+        var arrayRes = new Array();
+        var pass;
+        var pass2;
+        $("#formPregCuer-" + currentQ).find(".inputOrde").each(function (i) {
+            if ($(this).val() != "") {
+                $(this).removeAttr("style");
+                arrayRes[i] = $(this).val();
+            }
+            else {
+                pass = false;
+                $(this).css("border", "2px solid red").focus();
+                alertaCampoVacio();
+                return false;
+            }
+        });
+        if (pass != false) {
+            $("#formPregCuer-" + currentQ).find(".inputDesorde").each(function (i) {
+                if ($(this).val() != "") {
+                    $(this).removeAttr("style");
+                    arrayOpc[i] = $(this).val();
+                }
+                else {
+                    pass2 = false;
+                    $(this).css("border", "2px solid red").focus();
+                    alertaCampoVacio();
+                    return false;
+                }
+            });
+            if (pass2 != false) {
+                //aqui retorno los array
+                enviarPreguntaControlador(arrayOpc, arrayRes);
+            }
+        }
+    }
+    function obtener3() {
+        var arrayOpc = new Array();
+        var arrayRes = new Array();
+        var pass;
+        var pass2;
+        $("#formPregCuer-" + currentQ).find(".inputTradu").each(function (i) {
+            if ($(this).val() != "") {
+                $(this).removeAttr("style");
+                arrayRes[i] = $(this).val();
+            }
+            else {
+                pass = false;
+                $(this).css("border", "2px solid red").focus();
+                alertaCampoVacio();
+                return false;
+            }
+        });
+        if (pass != false) {
+            $("#formPregCuer-" + currentQ).find(".inputOriginal").each(function (i) {
+                if ($(this).val() != "") {
+                    $(this).removeAttr("style");
+                    arrayOpc[i] = $(this).val();
+                }
+                else {
+                    pass2 = false;
+                    $(this).css("border", "2px solid red").focus();
+                    alertaCampoVacio();
+                    return false;
+                }
+            });
+            if (pass2 != false) {
+                //aqui retorno los array
+                enviarPreguntaControlador(arrayOpc, arrayRes);
+            }
+        }
+    }
+    var arrayImg = new Array();
+    function editarImg(me) {
+        var pass = true;
+        for (var i = 0; i < arrayImg.length; i++) {
+            if ((currentQ == arrayImg[i].numQue) && ($(me).attr("id") == arrayImg[i].idInputImg)) {
+                pass = false;
+                break;
+            }
+        }
+        var numLiteral = $(me).attr("id").substr(10);
+        if (pass == true) {
+            var obj = {
+                idInputImg: $(me).attr("id"),
+                idOpcion: $(me).data("idopcion"),
+                numLite: numLiteral,
+                numQue: currentQ
+            };
+            arrayImg.push(obj);
+        }
+
+
+    }
+    function obtener4() {
+        var arrayOpc = new Array();
+        var arrayRes = new Array();
+        var pass;
+        var pass2;
+
+        for (var i = 0; i < arrayImg.length; i++) {
+            if (arrayImg[i].numQue != currentQ) {
+                continue;
+            }
+            if ($("#formPregCuer-" + currentQ).find("#txtImgOp-" + arrayImg[i].numLite).val() != "") {
+                $("#formPregCuer-" + currentQ).find("#txtImgOp-" + arrayImg[i].numLite).removeAttr("style");
+                arrayRes.push($("#formPregCuer-" + currentQ).find("#txtImgOp-" + arrayImg[i].numLite).val());
+            }
+            else {
+                pass = false;
+                $("#formPregCuer-" + currentQ).find("#txtImgOp-" + arrayImg[i].numLite).css("border", "2px solid red").focus();
+                alertaCampoVacio();
+                return false;
+            }
+        }
+        if (pass != false) {
+            for (var i = 0; i < arrayImg.length; i++) {
+                if (arrayImg[i].numQue != currentQ) {
+                    continue;
+                }
+                if ($("#formPregCuer-" + currentQ).find("#" + arrayImg[i].idInputImg).val() != "") {
+
+                }
+                else {
+                    pass2 = false;
+                    Messenger.options = {
+                        extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                        theme: 'flat'
+                    }
+                    Messenger().post({
+                        message: 'You have not uploaded the image in the ' + arrayImg[i].numLite + ' literal',
+                        type: 'error',
+                        hideAfter: 5,
+                        showCloseButton: false
+                    });
+                    return false;
+                }
+            }
+            if (pass2 != false) {
+                //aqui retorno los array
+                enviarPreguntaControlador(arrayOpc, arrayRes);
+            }
+        }
+    }
+
+
+    function obtener5() {
+        var arrayOpc = new Array();
+        var arrayRes = new Array();
+        var pass;
+        var pass2;
+        $("#formPregCuer-" + currentQ).find(".inputThead").each(function (i) {
+            if ($(this).val() != "") {
+                $(this).css("border", "1px solid #ccc");
+                arrayOpc[i] = $(this).val();
+            }
+            else {
+                pass = false;
+                $(this).css("border", "2px solid red").focus();
+                alertaCampoVacio();
+                return false;
+            }
+        });
+        if (pass != false) {
+            $("#formPregCuer-" + currentQ).find(".inputTbody").each(function (i) {
+                if ($(this).val() != "") {
+                    $(this).css("border", "1px solid #ccc");
+                    arrayRes[i] = $(this).val();
+                }
+                else {
+                    pass2 = false;
+                    $(this).css("border", "2px solid red").focus();
+                    alertaCampoVacio();
+                    return false;
+                }
+            });
+            if (pass2 != false) {
+                //aqui retorno los array
+                enviarPreguntaControlador(arrayOpc, arrayRes);
+            }
+        }
+    }
+    function obtener6() {
+        var arrayOpc = new Array();
+        var arrayRes = new Array();
+        var pass = false;
+        var pass2;
+
+        var checkIndice = 0;
+        var checkActi = 0;
+        var literalSel = $("#formPregCuer-" + currentQ).find("#literalesSel").children().last();
+        var indice = parseInt(literalSel[0].id.substr(11));
+        var noCheck = indice;
+        $("#formPregCuer-" + currentQ).find(".inputSel").each(function (i) {
+            if ($(this).val() != "") {
+                $(this).removeAttr("style");
+                arrayOpc[i] = $(this).val();
+                var idCheck = i + 1;
+                if ($("#formPregCuer-" + currentQ).find("#check-" + idCheck).is(":checked")) {
+                    checkActi++;
+                    if (checkActi == indice) {
+                        pass = false;
+                        Messenger.options = {
+                            extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                            theme: 'flat'
+                        }
+                        Messenger().post({
+                            message: 'All options can not be marked as correct',
+                            type: 'info',
+                            hideAfter: 3,
+                            showCloseButton: false
+                        });
+                        return false;
+                    }
+                    else {
+                        arrayRes[checkIndice] = $(this).val();
+                        checkIndice++;
+                        pass = true;
+                    }
+                }
+                else {
+                    noCheck--;
+                    if (noCheck == 0) {
+                        pass = false;
+                        Messenger.options = {
+                            extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                            theme: 'flat'
+                        }
+                        Messenger().post({
+                            message: 'You must mark at least one option as correct',
+                            type: 'info',
+                            hideAfter: 3,
+                            showCloseButton: false
+                        });
+                        return false;
+                    }
+                }
+            }
+            else {
+                pass = false;
+                $(this).css("border", "2px solid red").focus();
+                alertaCampoVacio();
+                return false;
+            }
+        });
+        if (pass != false) {
+            //aqui retorno los array
+            enviarPreguntaControlador(arrayOpc, arrayRes);
+        }
+    }
+    function obtener7() {
+        var arrayOpc = new Array();
+        var arrayRes = new Array();
+        var pass;
+        var pass2;
+        $("#formPregCuer-" + currentQ).find(".inputIzq").each(function (i) {
+            if ($(this).val() != "") {
+                $(this).removeAttr("style");
+                arrayRes[i] = $(this).val();
+            }
+            else {
+                pass = false;
+                $(this).css("border", "2px solid red").focus();
+                alertaCampoVacio();
+                return false;
+            }
+        });
+        if (pass != false) {
+            $("#formPregCuer-" + currentQ).find(".inputDer").each(function (i) {
+                if ($(this).val() != "") {
+                    $(this).removeAttr("style");
+                    arrayOpc[i] = $(this).val();
+                }
+                else {
+                    pass2 = false;
+                    $(this).css("border", "2px solid red").focus();
+                    alertaCampoVacio();
+                    return false;
+                }
+            });
+            if (pass2 != false) {
+                //aqui retorno los array
+                enviarPreguntaControlador(arrayOpc, arrayRes);
+            }
+        }
+    }
+
+    function sumarLiteral() {
+        var tipoPre = $("#formPregCabe-" + currentQ).find('#txtTipoPreg').attr("title");
+        switch (tipoPre) {
+            case '1':
+                sumarComplete();
+                break;
+            case '2':
+                sumarOrdenar();
+                break;
+            case '3':
+                sumarTraducir();
+                break;
+            case '4':
+                sumarImagen();
+                break;
+            case '6':
+                sumarSel();
+                break;
+            default:
+                break;
+        }
+    }
+    function restarLiteral() {
+        var tipoPre = $("#formPregCabe-" + currentQ).find('#txtTipoPreg').attr("title");
+        switch (tipoPre) {
+            case '1':
+                restarComplete();
+                break;
+            case '2':
+                restarOrdenar();
+                break;
+            case '3':
+                restarTraducir();
+                break;
+            case '4':
+                restarImagen();
+                break;
+            case '6':
+                restarSel();
+                break;
+            default:
+                break;
+        }
+    }
+    function sumarComplete() {
+        var literalCom = $("#formPregCuer-" + currentQ).find("#literalesCom").children().last();
+        var indice = (parseInt(literalCom[0].id.substr(11))) + 1;
+        var literalClon = '<div id="literalCom-' + indice + '" class="col-md-6 form-group"><div class="divComp input-group ">'
+            + '<span class="input-group-addon "><span class="fa fa-question " style="background-color: #DFF5F2"></span>'
+            + ' / <span class="fa fa-edit " style="background-color: #DFF5F2"></span></span><input class="inpComp form-control" type="text" /></div></div>';
+        $("#formPregCuer-" + currentQ).find("#literalesCom").append(literalClon);
+    }
+    function restarComplete() {
+        var literalCom = $("#formPregCuer-" + currentQ).find("#literalesCom").children().last();
+        var indice = literalCom[0].id.substr(11);
+        if (indice == "1") {
+            alertaUnLiteral();
+            return false;
+        }
+        $("#formPregCuer-" + currentQ).find("#literalCom-" + indice).remove();
+    }
+    function sumarOrdenar() {
+        var literalOrd = $("#formPregCuer-" + currentQ).find("#literalesOrd").children().last();
+        var indice = (parseInt(literalOrd[0].id.substr(11))) + 1;
+        var literalClon = '<div id="literalOrd-' + indice + '"><div class="col-md-6 form-group"><div class="input-group"><span class="input-group-addon">'
+            + '<span class="fa fa-question" style="background-color: #DFF5F2">'
+            + '</span></span><input type="text" class="form-control inputDesorde" placeholder="Disordered sentence" /></div></div>'
+            + '<div class="col-md-6 form-group"><div class="input-group"><span class="input-group-addon"><span class="fa fa-edit " style="background-color: #DFF5F2">'
+            + '</span></span><input type="text" class="form-control inputOrde" placeholder="Ordered sentence" /></div></div></div>';
+        $("#formPregCuer-" + currentQ).find("#literalesOrd").append(literalClon);
+    }
+    function restarOrdenar() {
+        var literalOrd = $("#formPregCuer-" + currentQ).find("#literalesOrd").children().last();
+        var indice = literalOrd[0].id.substr(11);
+        if (indice == "1") {
+            alertaUnLiteral();
+            return false;
+        }
+        $("#formPregCuer-" + currentQ).find("#literalOrd-" + indice).remove();
+    }
+    function sumarTraducir() {
+        var literalTra = $("#formPregCuer-" + currentQ).find("#literalesTra").children().last();
+        var indice = (parseInt(literalTra[0].id.substr(11))) + 1;
+        var literalClon = '<div id="literalTra-' + indice + '"><div class="col-md-6 form-group">'
+            + '<div class="input-group"><span class="input-group-addon"><span class="fa fa-question " style="background-color: #DFF5F2">'
+            + '</span></span><input type="text" class="form-control inputOriginal" placeholder="Original sentence" /></div></div>'
+            + '<div class="col-md-6 form-group"><div class="input-group"><span class="input-group-addon"><span class="fa fa-edit" style="background-color: #DFF5F2">'
+            + '</span></span><input type="text" class="form-control inputTradu" placeholder="Translation" /></div></div></div></div>';
+        $("#formPregCuer-" + currentQ).find("#literalesTra").append(literalClon);
+    }
+    function restarTraducir() {
+        var literalOrd = $("#formPregCuer-" + currentQ).find("#literalesTra").children().last();
+        var indice = literalOrd[0].id.substr(11);
+        if (indice == "1") {
+            alertaUnLiteral();
+            return false;
+        }
+        $("#formPregCuer-" + currentQ).find("#literalTra-" + indice).remove();
+    }
+    function sumarImagen() {
+        var literalImg = $("#formPregCuer-" + currentQ).find("#literalesImg").children().last();
+        var indice = (parseInt(literalImg[0].id.substr(11))) + 1;
+        var literalClon = '<div class="col-md-4" id="literalImg-' + indice + '">'
+            + '<input style="display:none" name="files" data-idopcion="0" type="file" class="inputImg" id="inputImag-' + indice + '" accept="image/*" onchange="fileMaxSize(this);readUrl(this);editarImg(this);" />'
+            + '<div class="portlet portlet-green"><div class="portlet-body " style="text-align:center"><button type="button" class="tre" data-idimg="' + indice + '" onclick="cargarImg(this)">'
+            + '<img id="blah-' + indice + '" class="blah img-thumbnail" src="../img/subirImagen.png" /></button></div><div class="portlet-footer">'
+            + '<input type="text" class="inputImgText form-control" id="txtImgOp-' + indice + '" data-idopcion="0" placeholder="Enter Meaning" style="text-align: center"/></div></div></div>';
+        $("#formPregCuer-" + currentQ).find("#literalesImg").append(literalClon);
+        var obj = {
+            idInputImg: "inputImag-" + indice,
+            idOpcion: 0,
+            numLite: indice,
+            numQue: currentQ
+        };
+        arrayImg.push(obj);
+    }
+    function restarImagen() {
+        var literalImg = $("#formPregCuer-" + currentQ).find("#literalesImg").children().last();
+        var indice = literalImg[0].id.substr(11);
+        if (indice == "1") {
+            alertaUnLiteral();
+            return false;
+        }
+        var idOp = $("#formPregCuer-" + currentQ).find("#literalImg-" + indice).find("#inputImag-" + indice).data("idopcion");
+        if (idOp != 0) {
+            eliminarOpcionImg(idOp);
+        }
+
+        for (var i = 0; i < arrayImg.length; i++) {
+            if ((currentQ == arrayImg[i].numQue) && (arrayImg[i].idInputImg == ("inputImag-" + indice))) {
+                arrayImg.splice(i, 1);
+                break;
+            }
+        }
+        $("#formPregCuer-" + currentQ).find("#literalImg-" + indice).remove();
+    }
+    function eliminarOpcionImg(idOpci) {
+        $.ajax({
+            url: "../Docente/eliminarLiteralImg",
+            type: "POST",
+            data: JSON.stringify({ idOpcion: idOpci }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (result) {
+                alert(result);
+            }
+        });
+    }
+    function sumarSel() {
+        var literalSel = $("#formPregCuer-" + currentQ).find("#literalesSel").children().last();
+        var indice = (parseInt(literalSel[0].id.substr(11))) + 1;
+        if (indice > 8) {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'Maximum 8 options',
+                type: 'info',
+                hideAfter: 3,
+                showCloseButton: false
+            });
+            return false;
+        }
+        var literalClon = '<div id="literalSel-' + indice + '" class="col-md-6 form-group"><div class="input-group"><span class="input-group-addon">'
+            + '<input type="checkbox" id="check-' + indice + '" class="inputSelChk" />'
+            + '</span><input type="text" class="form-control inputSel" placeholder="Option ' + indice + '" /></div></div>'
+        $("#formPregCuer-" + currentQ).find("#literalesSel").append(literalClon);
+    }
+    function restarSel() {
+        var literalImg = $("#formPregCuer-" + currentQ).find("#literalesSel").children().last();
+        var indice = literalImg[0].id.substr(11);
+        if (indice == "4") {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'There must be at least 4 options',
+                type: 'info',
+                hideAfter: 3,
+                showCloseButton: false
+            });
+            return false;
+        }
+        $("#formPregCuer-" + currentQ).find("#literalSel-" + indice).remove();
+    }
+
+    function crearTablaDepen() {
+        $("#formPregCuer-" + currentQ).find("#tablaDependencia").children().remove();
+        var tablaDependencia = $("#formPregCuer-" + currentQ).find("#tablaDependencia");
+        var fi = $("#formPregCuer-" + currentQ).find("#filas").val();
+        var col = $("#formPregCuer-" + currentQ).find("#colum").val();
+        var thead = document.createElement("THEAD");
+        var tr = document.createElement("TR");
+        for (var i = 0; i < col; i++) {
+            var th = document.createElement("TH");
+            var input = document.createElement("INPUT");
+            input.className = 'inputThead form-control';
+            input.placeholder = 'Header';
+            input.style.textAlign = 'center';
+            th.appendChild(input);
+            tr.appendChild(th);
+        }
+        thead.appendChild(tr);
+        tablaDependencia.append(thead);
+        var tbody = document.createElement("TBODY");
+        for (var i = 0; i < fi - 1; i++) {
+            var tr = document.createElement("TR");
+            tbody.appendChild(tr);
+            for (var j = 0; j < col; j++) {
+                var td = document.createElement("TD");
+                var input = document.createElement("INPUT");
+                input.className = 'inputTbody form-control';
+                input.placeholder = 'Content';
+                input.style.textAlign = 'center';
+                td.appendChild(input);
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+        }
+        tablaDependencia.append(tbody);
+    }
+    function alertaUnLiteral() {
+        Messenger.options = {
+            extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+            theme: 'flat'
+        }
+        Messenger().post({
+            message: 'There must be at least one literal',
+            type: 'info',
+            hideAfter: 3,
+            showCloseButton: false
+        });
+        return false;
+    }
+    function alertaCampoVacio() {
+        Messenger.options = {
+            extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+            theme: 'flat'
+        }
+        Messenger().post({
+            message: 'You can not continue. Empty field.',
+            type: 'error',
+            hideAfter: 3,
+            showCloseButton: false
+        });
+        return false;
+    }
+    function controlValor() {
+        var duracion = $("#formPregCabe-" + currentQ).find("#txtDuracion");
+        if (duracion.val() == 0) {
+            duracion.focus();
+            duracion.css("border", "2px solid red").focus();
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'Duration of the question not valid.',
+                type: 'error',
+                hideAfter: 3,
+                showCloseButton: false
+            });
+            return false;
+        }
+        duracion.removeAttr("style");
+    }
+    //var ponderacionSuma = ponderacionSuma;
+    function controlPonderacion() {
+        var ponde = $("#formPregCabe-" + currentQ).find("#txtPonderacion");
+        if (ponde.val() == 0) {
+            ponde.focus();
+            ponde.css("border", "2px solid red").focus();
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'Invalid question value',
+                type: 'error',
+                hideAfter: 3,
+                showCloseButton: false
+            });
+            return false;
+        }
+        ponderacionSuma = 0;
+        for (var i = 1; i <= contadorPregunta; i++) {
+            ponderacionSuma = ponderacionSuma + parseInt($("#formPregCabe-" + i).find("#txtPonderacion").val());
+        }
+        if (ponderacionSuma > 100) {
+            ponde.focus();
+            ponde.css("border", "2px solid red").focus();
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'Maximum score of the exceeded activity: (' + ponderacionSuma + '). Please correct',
+                type: 'error',
+                hideAfter: 3,
+                showCloseButton: false
+            });
+            return false;
+        }
+        ponde.removeAttr("style");
+    }
+
+    var imgLiteSltd;
+    function cargarImg(elemento) {
+        imgLiteSltd = elemento.dataset.idimg;
+        var inputClick = $("#formPregCuer-" + currentQ).find("#inputImag-" + imgLiteSltd);
+        if (inputClick.val() != "") {
+            imgLiteralCon--;
+        }
+        inputClick.click();
+    }
+    var imgLiteralCon = 0;
+    function readUrl(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $("#formPregCuer-" + currentQ).find('#blah-' + imgLiteSltd).attr('src', e.target.result).width(200).height(200);
+            };
+            imgLiteralCon++;
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    var botones1 = '<div class="col-sm-offset-7 col-sm-5"><div id="divBotones"><div class="btn-group btn-group-justified">'
+        + '<a class="btn btn-red" onclick="return false;" role="button">Remove question</a>'
+        + '<a class="btn btn-blue" onclick="habilitarEdicion();return false;" role="button">Edit question</a></div></div></div>';
+
+    var botones2 = '<div id="divBotones"><div class="col-sm-offset-4 col-sm-5"><div class="btn-group btn-group-justified">'
+        + '<a class="btn btn-blue" onclick=" sumarLiteral()" role="button">Add literal</a>'
+        + '<a class="btn btn-red" onclick=" restarLiteral()" role="button">Remove literal</a></div></div>'
+        + '<div class=" col-sm-3"><div class="form-group "><a class="btn btn-success btn-block" onclick=" guardarPregunta()" role="button">'
+        + '<span class="fa fa-save"></span> &nbsp;Save</a></div></div></div>';
+
+    function modalApoyo() {
+        if ($("#modalApoyo-" + currentQ).length > 0) {
+            $("#modalApoyo-" + currentQ).modal('show');
+        }
+        else {
+            var modalClon = '<div class="modal fade" id="modalApoyo-' + currentQ + '" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'
+                + '<div class="modal-dialog" style="width:45%" role="document"><div class="modal-content"><div class="modal-header bg-darrk-blue-o">'
+                + '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
+                + '<h4 class="modal-title">Backing:</h4'
+                + '</div></div><div class="modal-body"><input id="queApoyo" type="hidden" value="0"/>'
+                + '<form id="botonSeleccione"><div class="row"><div class=" col-lg-12"><div class="form-group">'
+                + '<div class="row"><div class="col-sm-4"><button type="button" onclick="crearApoyo(); return false" class="btn btn-success btn-block">'
+                + '<span class="fa fa-plus"></span>&nbspCreate new backing</button></div><div class="col-sm-4">'
+                + '<button type="button" onclick="asignarApoyo(); return false" class="btn btn-blue btn-block"><span class="fa fa-refresh"></span>'
+                + '&nbspReuse backing</button></div><div class="col-sm-4"><button type="button" onclick="msgElimnarApoyo();return false" class="btn btn-red btn-block">'
+                + '<span class="fa fa-trash-o"></span>&nbspDelete backing</button></div></div>'
+                + '</div></div></div></form><hr style="margin-top: 0px"/>'
+                + '<form id="formNuevoApoyo" method="post" enctype="multipart/form-data" style="display:none"><input id="apoyoId" type="hidden" value="0">'
+                + '<div class="row"><div class=" col-lg-12"><div class="form-group"><div class="row"><label for="textInput" class="col-sm-1 control-label">Title: &nbsp;</label>'
+                + '<div class="col-sm-11"><input type="text" class="form-control" id="inputApoyoTitulo"></div></div></div>'
+                + '<div class="form-group"><div class="checkbox ">'
+                + '<label><input type="checkbox" id="checkApoyoTexto" onclick="modalControls()" /> Text</label></div>'
+                + '<textarea id="inputApoyoTexto" class="form-control" style="resize:none;height: 15%" disabled></textarea></div><div class="form-group">'
+                + '<div class="checkbox "><label><input type="checkbox" id="checkApoyoImg" onclick="modalControls()" /> Image</label>'
+                + '</div><input type="file" onchange="fileMaxSize(this);" accept="image/*" id="inputApoyoImg" class="form-control" disabled /></div><div class="form-group"><div class="checkbox ">'
+                + '<label><input type="checkbox" id="checkApoyoLink" onclick="modalControls()"/> Insert video</label></div><input type="url" id="inputApoyolink" class="form-control" disabled />'
+                + '</div>'
+
+                + '<div class="form-group"><div class="checkbox ">'
+                + '<label><input type="checkbox" id="checkApoyoAudio"  onclick="modalControls()"/> Insert audio</label></div><input type="file" data-max="3072" onchange="fileMaxSize(this);" accept="audio/*" id="inputApoyoAudio" class="form-control input-file" disabled />'
+                + '</div>'
+
+                + '</div></div></form>'
+                + '<form id="formUsarApoyo" style="display: none;"><div class="row"><div class="col-lg-12"><div class="form-group">'
+                + '<label class="col-sm-3 control-label">Choose backing: &nbsp;</label><div class="col-sm-9"><select onchange="apoyoSelect(this)" id="selectUsarApoyo" class="form-group"><option selected>Chose</option></select></div>'
+                + '</div></div></div></form>'
+                + '</div></div></div></div>';
+            $("#allModals").append(modalClon);
+            $("#modalApoyo-" + currentQ).modal('show');
+        }
+
+    }
+
+    function crearApoyo() {
+        $("#modalApoyo-" + currentQ).find("#formNuevoApoyo").css("display", "block");
+        $("#modalApoyo-" + currentQ).find("#formUsarApoyo").css("display", "none");
+        $("#modalApoyo-" + currentQ).find("#queApoyo").val("0");
+    }
+    function asignarApoyo() {
+        $("#modalApoyo-" + currentQ).find("#formUsarApoyo").css("display", "block");
+        $("#modalApoyo-" + currentQ).find("#formNuevoApoyo").css("display", "none");
+        $("#modalApoyo-" + currentQ).find("#queApoyo").val("-1");
+        $("#modalApoyo-" + currentQ).find("#selectUsarApoyo").html("");
+        $("#modalApoyo-" + currentQ).find("#selectUsarApoyo").html('<option selected="">Seleccione</option>');
+        $.each(apoyosDisponibles, function (i, value) {
+            $("#modalApoyo-" + currentQ).find("#selectUsarApoyo").append('<option value="' + value.idApoyo + '">' + value.titulo + '</option>');
+        });
+    }
+    function apoyoSelect(aaa) {
+        var id = aaa;
+        $("#modalApoyo-" + currentQ).find("#queApoyo").val(id.value);
+
+    }
+
+    function frmPrgCP() {
+        var formularioPregu = '<form id="formPregCabe-' + contadorPregunta + '"><div class="row"><div class="col-md-5">'
+           + '<div class="form-group "><div class="input-group "><div class="input-group-btn"><button class="btn dropdown-toggle" data-toggle="dropdown">Skill <span class="caret">'
+           + '</span></button><ul class="dropdown-menu pull-left"><li class="liTxtDestreza" onclick=" destrezaSltd(this)" title="Listening"><a onclick="return false;" href="#">Listening</a></li>'
+           + '<li class="liTxtDestreza" onclick=" destrezaSltd(this)" title="Reading"><a onclick="return false;" href="#">Reading</a></li><li class="liTxtDestreza" onclick=" destrezaSltd(this)" title="Grammar/Vocabulary">'
+           + '<a onclick="return false;" href="#">Grammar/Vocabulary</a></li></ul></div><input class="form-control" type="text" style="text-align: justify; background-color: #fff" disabled value="Listening" id="txtDestreza" required="">'
+           + '</div></div></div><div class=" col-md-5"><div class="form-group "><div class="input-group "><div class="input-group-btn">'
+           + '<button class="btn" onclick="return false;">Duration</button></div><input class="form-control cabeControl" type="number" min="1" step="1" style="text-align: justify; background-color: #fff" onchange="controlValor()" placeholder=" 0 Min" id="txtDuracion" required="">'
+           + '</div></div></div><div class="col-md-2"><div class="form-group"><button type="button" onclick="modalApoyo();return false;" class="btn btn-dark-blue btn-block">'
+           + '<i class="fa fa-cog"></i> Backing</button>'
+           + '</div></div></div>'
+           + '<div class="row"><div class="col-md-5"><div class=" form-group"><div class="input-group"><div class="input-group-btn">'
+           + '<button class="btn" onclick="return false;">Value</button></div><input class="form-control cabeControl" type="number" style="text-align: left" placeholder="You have  ' + ponderacionSuma + ' points" step="1" onchange="controlPonderacion()" min="1" max="100" id="txtPonderacion" required=""></div></div></div><div class="col-md-7"><div class="form-group"><div class="input-group ">'
+           + '<div class="input-group-btn"><button class="btn dropdown-toggle" data-toggle="dropdown">Model <span class="caret"></span></button>'
+           + '<ul class="dropdown-menu pull-left">    ' + liTiposPregunta() + '    </ul></div><input class="form-control" type="text" style="text-align:justify; background-color:#fff" disabled title="1" value="Completar" id="txtTipoPreg" required="">'
+           + '</div></div></div></div><div class="row"><div class="col-sm-12"><div class="form-group"><div class="input-group"><div class=" input-group-btn">'
+           + '<button class=" btn" onclick="return false;">Instructions</button></div><input class="form-control cabeControl" id="txtInstrucciones" type="text" required />'
+           + '</div></div></div></div></form>'
+           + '<form id="formPregCuer-' + contadorPregunta + '"><input id="idPregunta" type="hidden" value="0" /></form>';
+        return formularioPregu;
+    }
+
+    function liTiposPregunta() {
+        var liTags = "";
+        for (var i = 0; i < arrayTiposPregunta.length; i++) {
+            var eachLiTag = '<li onclick="obtenerTipoPregunta(this)" class="liTipoPreg" data-idpregu="' + arrayTiposPregunta[i].idTipo + '" id="'
+                + arrayTiposPregunta[i].idTipo + '" title="' + arrayTiposPregunta[i].tipo + '"><a href="" onclick="return false;">' + arrayTiposPregunta[i].tipo + '</a></li>';
+            liTags = liTags.concat(eachLiTag);
+        }
+        return liTags;
+    }
+
+    var tipoPregunta1 = '<div class="row frmPreguntas" ><div class="col-lg-12"><p class="text-muted small" style="font-size:113%"><em>'
+         + '<strong>Tip: </strong></em>Type in quotation marks " " the words that are to be completed</p></div>'
+
+         + '<div class="col-lg-12"><div class="checkbox" style="margin-top: 0px;"><label><input id="mostrarOp" type="checkbox"> Mostar opciones</label></div></div>'
+
+         + '<div id="literalesCom"><div id="literalCom-1" class="col-md-6 form-group">'
+         + '<div class="divComp input-group "><span class="input-group-addon">'
+         + '<span class="fa fa-question " style="background-color: #DFF5F2"></span> / '
+         + '<span class="fa fa-edit " style="background-color: #DFF5F2"></span></span><input class="inpComp form-control" type="text" />'
+         + '</div></div></div><div id="divBotones"><div class="col-md-offset-4 col-md-5">'
+         + '<div class="form-group"><div class="btn-group btn-group-justified"><a class="btn btn-blue" onclick=" sumarComplete()" role="button">Add literal</a>'
+         + '<a class="btn btn-red" onclick=" restarComplete()" role="button">Remove literal</a></div></div>'
+         + '</div><div class=" col-md-3"><div class="form-group "><a class="btn btn-success btn-block" onclick=" guardarPregunta()" role="button"><span class="fa fa-save"></span> &nbsp;Guardar</a></div></div></div>';
+
+    var tipoPregunta2 = '<div class="row frmPreguntas"><div id="literalesOrd"><div id="literalOrd-1">'
+        + '<div class="col-md-6 form-group"><div class="input-group"><span class="input-group-addon"><span class="fa fa-question " style="background-color: #DFF5F2">'
+        + '</span></span><input type="text" class="form-control inputDesorde" placeholder="Disordered sentence" /></div></div>'
+        + '<div class="col-md-6 form-group">'
+        + '<div class="input-group"><span class="input-group-addon"><span class="fa fa-edit " style="background-color: #DFF5F2">'
+        + '</span></span><input type="text" class="form-control inputOrde" placeholder="Ordered sentence" /></div></div></div></div>'
+        + '<div id="divBotones"><div class="col-md-offset-4 col-md-5"><div class="form-group"><div class="btn-group btn-group-justified"><a class="btn btn-blue" onclick="sumarOrdenar()" role="button">Add literal</a>'
+        + '<a class="btn btn-red" onclick="restarOrdenar()" role="button">Remove literal</a></div></div></div>'
+        + '<div class=" col-md-3"><div class="form-group"><a class="btn btn-success btn-block" onclick=" guardarPregunta()" role="button"><span class="fa fa-save"></span> &nbsp;Save</a></div></div></div></div>';
+
+    var tipoPregunta3 = '<div class="row frmPreguntas"><div id="literalesTra"><div id="literalTra-1"><div class="col-md-6 form-group">'
+        + '<div class="input-group"><span class="input-group-addon"><span class="fa fa-question " style="background-color: #DFF5F2">'
+        + '</span></span><input type="text" class="form-control inputOriginal" placeholder="Original sentence" /></div></div>'
+        + '<div class="col-md-6 form-group"><div class="input-group"><span class="input-group-addon"><span class="fa fa-edit " style="background-color: #DFF5F2">'
+        + '</span></span><input type="text" class="form-control inputTradu" placeholder="Translation" /></div></div></div></div>'
+        + '<div id="divBotones"><div class="col-md-offset-4 col-md-5"><div class="form-group"><div class="btn-group btn-group-justified"><a class="btn btn-blue" onclick="sumarTraducir()" role="button">Add literal</a>'
+        + '<a class="btn btn-red" onclick="restarTraducir()" role="button">Remove literal</a></div></div></div>'
+        + '<div class=" col-md-3"><div class="form-group "><a class="btn btn-success btn-block" onclick=" guardarPregunta()" role="button"><span class="fa fa-save"></span> &nbsp;Save</a></div></div></div></div>';
+
+    var tipoPregunta4 = '<div class="row frmPreguntas">'
+
+        + '<div class="col-lg-12"><div class="checkbox" style="margin-top: 0px;"><label><input id="mostrarOp" type="checkbox"> Mostar opciones</label></div></div>'
+
+        + '<div  id="literalesImg"><div class="col-md-4" id="literalImg-1">'
+        + '<input style="display:none" name="files" data-idopcion="0" type="file" class="inputImg" id="inputImag-1" accept="image/*" onchange="fileMaxSize(this);readUrl(this);editarImg(this);" />'
+        + '<div class="portlet portlet-green"><div class="portlet-body " style="text-align:center"><button type="button" class="tre" data-idimg="1" onclick="cargarImg(this)">'
+        + '<img id="blah-1" class="blah img-thumbnail" src="../img/subirImagen.png" /></button></div><div class="portlet-footer">'
+        + '<input type="text" class="inputImgText form-control" id="txtImgOp-1" data-idopcion="0" placeholder="Enter Meaning" style="text-align: center; " /></div></div></div>'
+        + '</div><div id="divBotones"><div class="col-md-offset-4 col-md-5"><div class="form-group"><div class="btn-group btn-group-justified"><a class="btn btn-blue" onclick="sumarImagen()" role="button">Add literal</a>'
+        + '<a class="btn btn-red" onclick="restarImagen()" role="button">Remove literal</a></div></div></div>'
+        + '<div class=" col-md-3"><div class="form-group "><a class="btn btn-success btn-block" onclick=" guardarPregunta()" role="button"><span class="fa fa-save"></span>&nbsp; Save</a></div></div></div></div>';
+
+    var tipoPregunta5 = '<div class="row frmPreguntas"><div class="col-lg-12"><div class="dataTables_length"><label>Columns:</label>'
+        + '<select id="colum"><option>2</option><option>3</option><option>4</option><option>5</option></select><label>&nbsp;Rows:</label>'
+        + '<select id="filas"><option>2</option><option>3</option><option>4</option><option>5</option></select>&nbsp;&nbsp;'
+        + '<input type="button" class=" btn btn-success" onclick="crearTablaDepen()" value="Create table" /></div></div><div class="col-lg-12" style="margin-top:1%">'
+        + '<div class="table-responsive"><table id="tablaDependencia" class="table table-striped table-bordered table-hover table-green"></table></div></div>'
+        + '<div id="divBotones"><div class="col-md-offset-9 col-md-3"><div class="form-group "><a class="btn btn-success btn-block" onclick=" guardarPregunta()" role="button"><span class="fa fa-save"></span>&nbsp; Save</a></div></div></div></div>';
+
+    var tipoPregunta6 = '<div class="row frmPreguntas"><div class="col-lg-12"><p class="text-muted" style="font-size:113%"><em><strong>Tip:</strong></em>'
+        + 'Enter the opinions and check the ones that are correct</p></div><div id="literalesSel">'
+        + '<div id="literalSel-1" class="col-md-6 form-group"><div class="input-group"><span class="input-group-addon"><input type="checkbox" id="check-1" class="inputSelChk" />'
+        + '</span><input type="text" class="form-control inputSel" placeholder="Option 1" /></div></div><div id="literalSel-2" class="col-md-6 form-group">'
+        + '<div class="input-group "><span class="input-group-addon"><input type="checkbox" id="check-2" class="inputSelChk" /></span><input type="text" class="form-control inputSel" placeholder="Option 2" />'
+        + '</div></div><div id="literalSel-3" class="col-md-6 form-group"><div class="input-group"><span class="input-group-addon"><input type="checkbox" id="check-3" class="inputSelChk" />'
+        + '</span><input type="text" class="form-control inputSel" placeholder="Option 3" /></div></div><div id="literalSel-4" class="col-md-6 form-group">'
+        + '<div class="input-group"><span class="input-group-addon"><input type="checkbox" id="check-4" class="inputSelChk" /></span><input type="text" class="form-control inputSel" placeholder="Option 4" />'
+        + '</div></div></div><div id="divBotones"><div class="col-md-offset-4 col-md-5"><div class="form-group"><div class="btn-group btn-group-justified"><a class="btn btn-blue" onclick="sumarSel()" role="button">Add literal</a>'
+        + '<a class="btn btn-red" onclick="restarSel()" role="button">Remove literal</a></div></div></div>'
+        + '<div class=" col-md-3"><div class="form-group "><a class="btn btn-success btn-block" onclick=" guardarPregunta()" role="button"><span class="fa fa-save"></span> &nbsp;Save</a></div></div></div></div>';
+
+    var tipoPregunta7 = '<div class="row frmPreguntas"><div><div class="col-md-6 form-group"><div class="input-group"><span class="input-group-addon">'
+        + '<span class="fa fa-question " style="background-color: #DFF5F2"></span></span><input type="text" class="form-control inputIzq" />'
+        + '</div></div><div class="col-md-6 form-group"><div class="input-group"><span class="input-group-addon"><span class="fa fa-edit " style="background-color: #DFF5F2">'
+        + '</span></span><input type="text" class="form-control inputDer" /></div></div><div class="col-md-6 form-group"><div class="input-group"><span class="input-group-addon">'
+        + '<span class="fa fa-question " style="background-color: #DFF5F2"></span></span><input type="text" class="form-control inputIzq" /></div>'
+        + '</div><div class="col-md-6 form-group"><div class="input-group"><span class="input-group-addon"><span class="fa fa-edit" style="background-color: #DFF5F2">'
+        + '</span></span><input type="text" class="form-control inputDer" /></div></div><div class="col-md-6 form-group"><div class="input-group">'
+        + '<span class="input-group-addon"><span class="fa fa-question " style="background-color: #DFF5F2"></span></span>'
+        + '<input type="text" class="form-control inputIzq" /></div></div><div class="col-md-6 form-group"><div class="input-group"><span class="input-group-addon">'
+        + '<span class="fa fa-edit" style="background-color: #DFF5F2"></span></span><input type="text" class="form-control inputDer" />'
+        + '</div></div><div class="col-md-6 form-group"><div class="input-group"><span class="input-group-addon">'
+        + '<span class="fa fa-question " style="background-color: #DFF5F2"></span></span><input type="text" class="form-control inputIzq" />'
+        + '</div></div><div class="col-md-6 form-group"><div class="input-group"><span class="input-group-addon"><span class="fa fa-edit " style="background-color: #DFF5F2">'
+        + '</span></span><input type="text" class="form-control inputDer" /></div></div></div><div id="divBotones"><div class="col-md-offset-9 col-md-3"><div class="form-group ">'
+        + '<a class="btn btn-success btn-block" onclick=" guardarPregunta()" role="button"><span class="fa fa-save"></span> &nbsp;Save</a></div></div></div></div>';
+    var allTP = new Array();
+    allTP.push(tipoPregunta1);
+    allTP.push(tipoPregunta2);
+    allTP.push(tipoPregunta3);
+    allTP.push(tipoPregunta4);
+    allTP.push(tipoPregunta5);
+    allTP.push(tipoPregunta6);
+    allTP.push(tipoPregunta7);
+
+    function fileMaxSize(file) {
+        var sizeByte = file.files[0].size;
+        var siezekiloByte = parseInt(sizeByte / 1024);
+        if (siezekiloByte > $(file).data('max')) {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'File size exceeds allowed limit (3Mb)',
+                type: 'error',
+                hideAfter: 4,
+                showCloseButton: false
+            });
+            $(file).val('');
+        }
+    }
+
+    function reportarActividad() {
+        var idActi = $("#idAct").val();
+        $.ajax({
+            url: "../Docente/reportarActividad",
+            type: "POST",
+            data: JSON.stringify({ _idActividad: idActi }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (result) {
+                Messenger.options = {
+                    extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                    theme: 'flat'
+                }
+                Messenger().post({
+                    message: 'Activity reported. The administrator will review it',
+                    type: 'success',
+                    hideAfter: 3,
+                    showCloseButton: false
+                });
+                return false;
+            }
+        });
+    }
+
+</script>

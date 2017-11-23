@@ -1,0 +1,1163 @@
+﻿@using BLearning.Models.Negocio
+@{
+    ViewBag.Title = "Estatistic";
+    Layout = "~/Views/Shared/_LayoutAdministrador.cshtml";
+}
+
+@Styles.Render("~/Content/plugins/chart/horizBarChart.css")
+@Styles.Render("~/Content/plugins/morris/morris.css")
+@Styles.Render("~/Content/plugins/messenger/messenger.css")
+@Styles.Render("~/Content/plugins/messenger/messenger-theme-flat.css")
+
+<!-- begin PAGE TITLE AREA -->
+<!-- Use this section for each page's title and breadcrumb layout. In this example a date range picker is included within the breadcrumb. -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="page-title">
+            <h1>
+                Student - Statistics
+            </h1>
+            <ol class="breadcrumb">
+                <li class="active"><i class="fa fa-bar-chart-o"></i> Reports</li>
+            </ol>
+        </div>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+
+<div class="row" id="parametrosReporte">
+    <div class="col-lg-2">
+        <div class="input-group">
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-dark-blue dropdown-toggle" data-toggle="dropdown">
+                    Code
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li onclick="selectValue(1)" class="codigo" data-value="E">
+                        <a href="javascript:;">E</a>
+                    </li>
+                </ul>
+            </div>
+            <input type="text" id="txtCodigo" class="form-control" value="E" disabled style="background-color:#fff">
+        </div>
+    </div>
+    <div class="col-lg-2">
+        <div class="input-group">
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-dark-blue dropdown-toggle" data-toggle="dropdown">
+                    Cycle
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    @{var contador = 0;}
+                    @foreach (var item in (List<CiclosEntidad>)ViewData["Ciclos"])
+                    {
+                        contador++;
+                        <li onclick="selectValue(2,@contador)" class="ciclo-@contador" data-value="@item.ciclo" data-id="@item.idCiclo">
+                            <a href="javascript:;">@item.ciclo</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <input type="text" class="form-control" id="txtCiclo" disabled style="background-color:#fff">
+        </div>
+
+    </div>
+    <div class="col-lg-4">
+        <div class="input-group">
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-dark-blue  dropdown-toggle" data-toggle="dropdown">
+                    Module type
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" id="ul-tipoModulo"></ul>
+            </div>
+            <input type="text" class="form-control" id="txtTipoModulo" disabled style="background-color:#fff">
+        </div>
+
+    </div>
+    <div class="col-lg-4">
+        <div class="input-group">
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-dark-blue  dropdown-toggle" data-toggle="dropdown">
+                    Level
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" id="ul-nivel"></ul>
+            </div>
+            <input type="text" class="form-control" id="txtNivel" disabled style="background-color:#fff">
+        </div>
+    </div>
+</div>
+<br />
+
+
+<div class="row">
+    <div class="col-lg-12">
+
+        <div class="portlet portlet-default">
+            <div class="portlet-heading">
+                <div class="portlet-title">
+                    <h4>Comparative effectiveness by level</h4>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="portlet-body">
+                <div class="row">
+                    <div class="col-sm-10 col-sm-offset-1" style="text-align:center">
+                        <div id="barChart2">
+                            <div class="portlet-body" id="">
+                                <div id="chart-bar2" style="position: relative;">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.portlet-body -->
+        </div>
+        <!-- /.portlet -->
+
+    </div>
+    <!-- /.col-lg-12 -->
+
+</div>
+<div class="row">
+    <div class="col-lg-6">
+
+        <div class="portlet portlet-default">
+            <div class="portlet-heading">
+                <div class="portlet-title">
+                    <h4>Effectiveness</h4>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="portlet-body">
+                <ul id="myTab" class="nav nav-tabs">
+                    <li class="active" onclick="verXnivel(2)">
+                        <a href="#myTabDrop2" data-toggle="tab">Level</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" id="myTabDrop1" class="dropdown-toggle" data-toggle="dropdown"> Parallel <b class="caret"></b></a>
+                        <ul class="dropdown-menu" id="ul-paralelo" role="menu" aria-labelledby="myTabDrop1"></ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" id="myTabDrop3" class="dropdown-toggle" data-toggle="dropdown"> Degree <b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="myTabDrop3">
+                            @foreach (var item in (List<CarreraEntidad>)ViewData["Carreras"])
+                            {
+                                <li onclick="verXcarrera(@item.idCarrera,2)"><a id="carrera-@item.idCarrera" href="#myTabDrop2" data-toggle="tab">@item.carrera</a></li>
+                            }
+                        </ul>
+                    </li>
+                </ul>
+                <div id="myTabContent" class="tab-content">
+                    <div class="tab-pane fade in active" id="myTabDrop2">
+                        <form role="form" id="tituloEfect"></form>
+                        <div class="row">
+                            <div class="col-sm-10 col-sm-offset-1" style="text-align:center">
+                                <div id="barChart">
+                                    <div class="portlet-body" id="General">
+                                        <div id="chart-bar" style="position: relative;">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-10 col-sm-offset-1" style="text-align:center">
+                                <div id="barChart2">
+                                    <div class="portlet-body" id="Comparativa">
+                                        <div id="chart-bar2" style="position: relative;">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- /.portlet-body -->
+        </div>
+        <!-- /.portlet -->
+
+    </div>
+    <!-- /.col-lg-12 -->
+    <div class=" col-lg-6">
+        <div class="portlet portlet-default">
+            <div class="portlet-heading">
+                <div class="portlet-title">
+                    <h4>Positions</h4>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="portlet-body">
+                <ul id="myTab" class="nav nav-tabs">
+                    <li class="active" onclick="pastelCiclo()">
+                        <a href="#cicloPastel" data-toggle="tab">Cycle</a>
+                    </li>
+                    <li class="" onclick="pastelNivel()">
+                        <a href="#nivelPastel" data-toggle="tab">Level</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" id="myPillDrop1" class="dropdown-toggle" data-toggle="dropdown"> Parallel <b class="caret"></b></a>
+                        <ul class="dropdown-menu" id="ul-paraleloPastel" role="menu" aria-labelledby="myPillDrop1"></ul>
+                    </li>
+                </ul>
+                <div id="myTabContent" class="tab-content">
+                    <div class="tab-pane fade in active" id="cicloPastel">
+                        <div class="row">
+                            <div class=" col-md-8">
+                                <div class="portlet-body">
+                                    <div id="morris-chart-donutCiclo"></div>
+                                </div>
+                            </div>
+                            <div id="tagsCiclo" style="display:none" class=" col-md-4">
+                                <br />
+                                <br />
+                                <br />
+                                <ul>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #92d050'></span>&nbsp
+                                        <a id="Excellent" href="#" onclick="modalCali(this); return false;">Excellent</a>
+                                    </li>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #46b8e9;'></span>&nbsp
+                                        <a id="Verygood" href="#" onclick="modalCali(this); return false;">Very Good</a>
+                                    </li>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #ffff00;'></span>&nbsp
+                                        <a id="Good" href="#" onclick="modalCali(this); return false;">Good</a>
+                                    </li>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #f79646; '></span>&nbsp
+                                        <a id="Regular" href="#" onclick="modalCali(this); return false;">Regular</a>
+                                    </li>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #ff0000'></span>&nbsp
+                                        <a id="Deficient" href="#" onclick="modalCali(this); return false;">Deficient</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="nivelPastel">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="portlet-body">
+                                    <div id="morris-chart-donutNivel"></div>
+                                </div>
+                            </div>
+                            <div id="tagsNivel" style="display:none" class=" col-md-4">
+                                <br />
+                                <br />
+                                <br />
+                                <ul>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #92d050'></span>&nbsp
+                                        <a id="Excellent" href="#" onclick="modalCali(this); return false;">Excellent</a>
+                                    </li>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #46b8e9;'></span>&nbsp
+                                        <a id="Verygood" href="#" onclick="modalCali(this); return false;">Very Good</a>
+                                    </li>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #ffff00;'></span>&nbsp
+                                        <a id="Good" href="#" onclick="modalCali(this); return false;">Good</a>
+                                    </li>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #f79646;'></span>&nbsp
+                                        <a id="Regular" href="#" onclick="modalCali(this); return false;">Regular</a>
+                                    </li>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #ff0000'></span>&nbsp
+                                        <a id="Deficient" href="#" onclick="modalCali(this); return false;">Deficient</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="paraleloPastel">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="portlet-body">
+                                    <div id="morris-chart-donutParalelo"></div>
+                                </div>
+                            </div>
+                            <div id="tagsPara" style="display:none" class=" col-md-4">
+                                <br />
+                                <br />
+                                <br />
+                                <ul>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #92d050;'></span>&nbsp
+                                        <a id="Excellent" href="#" onclick="modalCali(this); return false;">Excellent</a>
+                                    </li>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #46b8e9;'></span>&nbsp
+                                        <a id="Verygood" href="#" onclick="modalCali(this); return false;">Very Good</a>
+                                    </li>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #ffff00;'></span>&nbsp
+                                        <a id="Good" href="#" onclick="modalCali(this); return false;">Good</a>
+                                    </li>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #f79646;'></span>&nbsp
+                                        <a id="Regular" href="#" onclick="modalCali(this); return false;">Regular</a>
+                                    </li>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #ff0000'></span>&nbsp
+                                        <a id="Deficient" href="#" onclick="modalCali(this); return false;">Deficient</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.portlet-body -->
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="portlet portlet-default">
+            <div class="portlet-heading">
+                <div class="portlet-title">
+                    <h4>Time</h4>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="portlet-body">
+                <ul id="myPills" class="nav nav-tabs">
+                    <li class="active" onclick="verXnivel(1)">
+                        <a href="#tiempo" data-toggle="tab">Level</a>
+                    </li>
+
+                    <li class="dropdown">
+                        <a href="#" id="myPillDrop1" class="dropdown-toggle" data-toggle="dropdown"> Parallel <b class="caret"></b></a>
+                        <ul class="dropdown-menu" id="ul-paraleloT" role="menu" aria-labelledby="myPillDrop1"></ul>
+                    </li>
+
+                    <li onclick="verXcarrera(1,1)">
+                        <a href="#tiempo" data-toggle="tab">Degree </a>
+                    </li>
+                </ul>
+                <div id="myPillsContent" class="tab-content">
+
+                    <div class="tab-pane fade in active" id="tiempo">
+                        <form role="form" id="tituloTiempo"></form>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="chart-horiz">
+                                    <!-- Actual bar chart -->
+                                    <ul class="chart"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <!-- /.portlet-body -->
+        </div>
+        <!-- /.portlet -->
+
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="portlet portlet-default">
+            <div class="portlet-heading">
+                <div class="portlet-title">
+                    <h4>Detail of student performance</h4>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="portlet-body">
+                <ul id="myTab" class="nav nav-tabs">
+                    <li class="dropdown">
+                        <a href="#" id="myTabDrop1" class="dropdown-toggle" data-toggle="dropdown"> Parallel <b class="caret"></b></a>
+                        <ul class="dropdown-menu" id="ul-paraleloScores" role="menu" aria-labelledby="myTabDrop1"></ul>
+                    </li>
+                </ul>
+                <div id="myTabContent" class="tab-content">
+                    <div class="tab-pane fade in active" id="calificaciones" style="text-align:center">
+                        <div class="table-responsive">
+                            <table id="tablaPormedios" class="table table-bordered table-hover table-condensed">
+                                <thead id="tHeadtablaProme">
+                                </thead>
+                                <tbody id="tBodyTablaProme"></tbody>
+                            </table>
+                        </div>
+
+                    </div>
+
+                    <div class="tab-pane fade" id="tiempo">
+                        <div id="chart-horizontal" class="panel-collapse collapse in">
+                            <div class="portlet-body">
+                                <br />
+                                <div class="chart-horiz">
+                                    <!-- Actual bar chart -->
+                                    <ul class="chart"></ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- /.portlet-body -->
+        </div>
+        <!-- /.portlet -->
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="modalAsignar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:60%" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-darrk-blue-o">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">Scores</h4>
+            </div>
+            <div class="modal-body">
+                <div class=" row">
+                    <div class=" col-lg-12">
+                        <div class="table-responsive">
+                            <table id="tablaDependencia" class="table table-striped table-bordered table-hover table-green">
+                                <thead>
+                                    <tr role="row">
+                                        <th>Names</th>
+                                        <th>Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tBodyCalificaciones"></tbody>
+                            </table>
+
+                            <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content ui-corner-all" id="ui-id-1" tabindex="0" style="display: none; min-width: 98px; z-index: 100001; width: 112px; top: 188px; left: 300px;">
+                                <li class="ui-menu-item" role="presentation">
+                                    <a id="ui-id-2" class="ui-corner-all" tabindex="-1">red</a>
+                                </li>
+                                <li class="ui-menu-item" role="presentation">
+                                    <a id="ui-id-3" class="ui-corner-all" tabindex="-1">blue</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalEfectividad" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="true">
+    <div class="modal-dialog" style="width:50%" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-darrk-blue-o">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel1">Percent effectiveness</h4>
+            </div>
+            <div class="modal-body">
+                <div class=" row">
+                    <div class=" col-lg-10 col-lg-offset-1">
+                        <div id="chart-bar1" style="position: relative; width:auto">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalGif" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:60%" role="document">
+        <div id="contenedor">
+            <div class="loader" id="loader">Loading...</div>
+        </div>
+    </div>
+</div>
+<!-- /Bryan -->
+@Scripts.Render("~/Scripts/plugins/morris/raphael-2.1.0.min.js")
+@Scripts.Render("~/Scripts/plugins/morris/morris.js")
+@Scripts.Render("~/Scripts/plugins/horizBarChart.js")
+@Scripts.Render("~/Scripts/plugins/messenger/messenger.min.js")
+@Scripts.Render("~/Scripts/plugins/messenger/messenger-theme-flat.js")
+@Scripts.Render("~/Scripts/redondearDecimales.js")
+@Scripts.Render("~/Scripts/estado-calificacion.js")
+
+<script>
+    $(document).ajaxStart(function () {
+        $("#modalGif").modal('show');
+    });
+    $(document).ajaxStop(function () {
+        $("#modalGif").modal('hide');
+        //$('body').removeClass('modal-open');
+        //$('.modal-backdrop').remove();
+    });
+
+    var idTipoMod = 0;
+    var idCiclo = 0;
+    var idNivel = 0;
+    var equivTip= 0;
+    var numNivel = 0;
+    function selectValue(value, cont) {
+        $("#tBodyTablaProme").html("");
+        $("#tHeadtablaProme").html("");
+        switch (value) {
+            case 1:
+                $("#txtCodigo").val($('.codigo').attr('data-value'));
+                break;
+            case 2:
+                var ciclo = $('.ciclo-' + cont).attr('data-value');
+                $("#txtCiclo").val(ciclo);
+                idCiclo = $('.ciclo-' + cont).attr('data-id');
+
+                cargarComboTiposModulo(ciclo);
+                break;
+            case 3:
+                equivTip = $('.tipoModulo-' + cont).attr('data-value');
+                $("#txtTipoModulo").val(equivTip);
+                var cicl = $("#txtCiclo").val();
+                idTipoMod = $('.tipoModulo-' + cont).attr('data-idT');
+                CargarComboNivel(cicl, idTipoMod);
+                break;
+            default:
+                $("#txtNivel").val($('.nivel-'+cont).attr('data-value'));
+                numNivel = $('.nivel-' + cont).attr('data-num');
+                idNivel = $('.nivel-' + cont).attr('data-id');
+                cargarParalelos();
+                verXnivel();
+                pastelCiclo();
+                break;
+        }
+    }
+
+    function cargarComboTiposModulo(c) {
+        $.ajax({
+            url: "../Administrador/CargarTipoModulo",
+            type: "POST",
+            data: JSON.stringify({ ciclo: c }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (result) {
+                $("#txtTipoModulo").val("");
+                $("#ul-tipoModulo").empty();
+                $.each(result, function (index) {
+                    var item = "<li onclick='selectValue(3, " + index + ")' class='tipoModulo-" + index + "'  data-value='" + result[index].equivalenteTipo + "' data-idT='"+result[index].idTipoModulo+"'> <a href='javascript:;'>" + result[index].equivalenteTipo + "</a></li>";
+                    $("#ul-tipoModulo").append(item);
+                })
+
+            }
+        });
+    }
+    function CargarComboNivel(c, tm) {
+        $.ajax({
+            url: "../Administrador/CargarNivel",
+            type: "POST",
+            data: JSON.stringify({ ciclo: c, tipoModulo: tm }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (result) {
+                $("#txtNivel").val("");
+                $("#ul-nivel").empty();
+                $.each(result, function (index) {
+                    var item = "<li onclick='selectValue(0, " + index + ")' class='nivel-" + index + "'  data-value='" + result[index].equivalente + "' data-id='"+result[index].idNivel+"' data-num='" + result[index].numeroNivel + "'> <a href='javascript:;'>" + result[index].equivalente + "</a></li>";
+                    $("#ul-nivel").append(item);
+                })
+
+            }
+        });
+    }
+
+    function cargarParalelos(){
+        var codig = $("#txtCodigo").val();
+        var cicl = $("#txtCiclo").val();
+        var niv = $("#txtNivel").val();
+        if (codig != undefined && cicl != undefined && niv != undefined && idTipoMod != undefined && idTipoMod != 0 ) {
+            $.ajax({
+                url: "../Administrador/cargarParalelos",
+                type: "POST",
+                data: JSON.stringify({ ciclo: cicl, idTipoModulo: idTipoMod, nivel: niv, codigo: codig}),
+                contentType: 'application/json',
+                processData: false,
+                success: function (result) {
+                    $("#ul-paralelo").empty();
+                    $("#ul-paraleloT").empty();
+                    $("#ul-paraleloPastel").empty();
+                    $("#ul-paraleloScores").empty();
+                    $.each(result, function (index) {
+                        var item = "<li onclick='verXparalelo(" + result[index] + ",2)'> <a href='#myTabDrop2' data-toggle='tab'>" + result[index] + "</a></li>";
+                        $("#ul-paralelo").append(item);
+                        var item1 = "<li onclick='verXparalelo(" + result[index] + ",1)'> <a href='#tiempo'  data-toggle='tab'>" + result[index] + "</a></li>";
+                        $("#ul-paraleloT").append(item1);
+                        // Script Bryan
+                        var item2 = "<li onclick='pastelParalelo(this);' data-value='" + result[index] + "'> <a href='#paraleloPastel' tabindex='-1' data-toggle='tab'>" + result[index] + "</a></li>";
+                        $("#ul-paraleloPastel").append(item2);
+                        var item3 = "<li onclick='crearTabla(this);' data-value='" + result[index] + "'> <a href='#calificaciones' tabindex='-1' data-toggle='tab'>" + result[index] + "</a></li>";
+                        $("#ul-paraleloScores").append(item3);
+                        // end Script Bryan
+                    });
+                }
+            });
+        }
+    }
+
+    function verXnivel(elemento) {
+
+        var codig = $("#txtCodigo").val();
+        var cicl = $("#txtCiclo").val();
+        var niv = $("#txtNivel").val();
+        if (codig != undefined && cicl != undefined && niv != undefined && equivTip != undefined && equivTip != 0) {
+            $.ajax({
+                url: "../Administrador/consultarXnivel",
+                async: false,
+                type: "POST",
+                data: JSON.stringify({ nC: cicl, eT: equivTip, eN: niv, cM: codig}),
+                contentType: 'application/json',
+                processData: false,
+                success: function (result) {
+                    switch(elemento)
+                    {
+                        case 1:
+                            ingresarGraficoXnivelTiempo(result,niv);
+                            break;
+                        case 2:
+                            ingresarGraficoXnivelEfectividad(result, niv);
+                            break;
+                        default:
+                            ingresarGraficoXnivelTiempo(result,niv);
+                            ingresarGraficoXnivelEfectividad(result, niv);
+                            break;
+                    }
+
+                }
+            });
+        }
+    }
+
+    function ingresarGraficoXnivelTiempo(result, niv) {
+        $("#tituloTiempo").html("");
+        //$("#tituloTiempo").append("<h5 class='page-header'><strong>Level: </strong>" + niv + " </br><strong>Average time of levels at the level: </strong> " + result.tiempoTotal + "</h5>");
+        $("#tituloTiempo").append("<h5 class='page-header'><strong>Average time of levels at the level: </strong> " + result.tiempoTotal + "</h5>");
+        graficoTiempo(result);
+    }
+    function ingresarGraficoXnivelEfectividad(result, niv) {
+        $("#tituloEfect").html("");
+        $("#General").html("<div id='chart-bar' style='position: relative;'></div>");
+        $("#Comparativa").html("<div id='chart-bar2' style='position: relative;'></div>");
+        //$("#tituloEfect").append("<h4 class='page-header'><strong>Level: </strong>" + niv + "</h4>");
+        graficoEfectividadComparativo(result);
+        graficoEfectividad(result);
+    }
+
+    function verXparalelo(pa,elemento) {
+        var codig = $("#txtCodigo").val();
+        var cicl = $("#txtCiclo").val();
+        var niv = $("#txtNivel").val();
+        if (codig != undefined && cicl != undefined && niv != undefined && equivTip != undefined && equivTip != 0) {
+            $.ajax({
+                url: "../Administrador/consultarXcicloNivelYparalelo",
+                async: false,
+                type: "POST",
+                data: JSON.stringify({ idCiclo: idCiclo, eT: equivTip, idNivel: idNivel, cM: codig, p: pa }),
+                contentType: 'application/json',
+                processData: false,
+                success: function (result) {
+                    if (pa < 10)
+                        pa = '0' + pa;
+                    var curso = 'C' + cicl + 'E' + numNivel + '' + pa;
+                    switch (elemento) {
+                        case 1:
+                            $("#tituloTiempo").html("");
+                            $("#tituloTiempo").append("<h5 class='page-header'><strong> Teacher: </strong>  " + result.docenteM + " </br></br> <strong> Course: </strong>" + curso + " </h5>");
+                            graficoTiempo(result);
+                            break;
+                        case 2:
+                            $("#tituloEfect").html("");
+                            $("#General").html("<div id='chart-bar' style='position: relative;'></div>");
+                            $("#Comparativa").html("<div id='chart-bar2' style='position: relative;'></div>");
+                            $("#tituloEfect").append("<h5 class='page-header'><strong> Teacher: </strong>  " + result.docenteM + " </br></br> <strong> Course: </strong>" + curso + " </h5>");
+                            graficoEfectividad(result);
+                            break;
+                        default:
+                            break;
+                    }
+                },
+                error: function(){
+                    alert("Errooorrrr");
+                }
+
+            });
+        }
+    }
+
+    function verXcarrera(carrera, elemento) {
+        var codig = $("#txtCodigo").val();
+        var cicl = $("#txtCiclo").val();
+        var niv = $("#txtNivel").val();
+        if (codig != undefined && cicl != undefined && niv != undefined && equivTip != undefined && equivTip != 0) {
+            $.ajax({
+                url: "../Administrador/consultarXcarrera",
+                type: "POST",
+                data: JSON.stringify({ nC: cicl, eN: niv, cM: codig, eT: equivTip, ca: carrera }),
+                contentType: 'application/json',
+                processData: false,
+                success: function (result) {
+                    switch (elemento) {
+                        case 1:
+                            $("#tituloTiempo").html("");
+                            $("#tituloTiempo").append("<h5 class='page-header'><strong> DEGREE</strong></h5>");
+                            graficoTiempo(result);
+                            break;
+                        case 2:
+                            $("#tituloEfect").html("");
+                            $("#General").html("<div id='chart-bar' style='position: relative;'></div>");
+                            $("#Comparativa").html("<div id='chart-bar2' style='position: relative;'></div>");
+                            var nombreCarrera = document.getElementById('carrera-' + carrera);
+                            $("#tituloEfect").append("<h5 class='page-header'><strong> " + nombreCarrera.innerHTML + "</strong></h5>");
+                            graficoEfectividad(result);
+                            break;
+                    }
+                }
+            });
+        }
+    }
+
+    function graficoEfectividadComparativo(result) {
+        $("#chart-bar2").html("");
+        if (result.efecTividadComparativa.length != 0)
+        {
+            var MorrisBar = Morris.Bar({
+                element: 'chart-bar2',
+                data: result.efecTividadComparativa,
+                xkey: 'modulo',
+                ykeys: ['Listening', 'Reading', 'GrammarVocabulary'],
+                postUnits: '%',
+                labels: ['Listening', 'Reading', 'Grammar/Vocabulary'],
+                hideHover: 'auto',
+                goals: [100],
+                resize: true,
+                xLabelFormat: function (d) {
+                    return d.src.modulo;
+                },
+                barColors: ["#92d050", "#46b8e9", "#ffff00"],
+                hoverCallback: function (index, options, content, row) {
+                    return content;
+                }
+            });
+        }else {
+            $("#Comparativa").html("<div id='chart-bar2' style='position: relative;'></div>");
+        }
+    }
+
+
+    function graficoEfectividad(result) {
+        $("#chart-bar").html("");
+        if (result.dataEfectividad.length != 0)
+        {
+            var MorrisBar = Morris.Bar({
+                element: 'chart-bar',
+                data: result.dataEfectividad,
+                xkey: 'tipoEfectividad',
+                ykeys: ['porcentaje'],
+                postUnits: '%',
+                labels: ['Porcentaje'],
+                hideHover: 'auto',
+                goals: [100],
+                resize: true,
+                xLabelFormat: function (d) {
+                    return d.src.tipoEfectividad;
+                },
+                barColors: ["#3ee9d1"],
+                hoverCallback: function (index, options, content, row) {
+                    return content;
+                }
+            });
+        } else {
+            $("#General").html("<div id='chart-bar' style='position: relative;'></div>");
+            $("#chart-bar").append("<h5>No datas</h5>");
+        }
+    }
+
+    function graficoTiempo(result){
+        $('.chart').html("");
+        if (result.tiempoParalelo.length != 0)
+
+            if (result.tt != undefined && result.tt != 0) {
+                $(".chart").append("<li class='current' title='AVERAGE MODULE TIME'><span class='bar' data-number='" + result.tt + "'></span><span class='number'>" + result.tts + "</span></li>");
+                $.each(result.tiempoParalelo, function (index, value) {
+                    $(".chart").append("<li class='past' title='" + value.label + "'><span class='bar' data-number='" + value.tiempo + "'></span><span class='number'>" + value.tiempoString + "</span></li>");
+                });
+            } else {
+                $.each(result.tiempoParalelo, function (index, value) {
+                    $(".chart").append("<li class='past' title='" + value.label + "'><span class='bar' data-number='" + value.tiempo + "'></span><span class='number'>" + value.tiempoString + "</span></li>");
+                });
+            }
+        else
+        {
+            $(".chart").append("<h5>No datas</h5>");
+        }
+
+        $('.chart').horizBarChart({
+            selector: '.bar',
+            speed: 1000
+        });
+    }
+
+
+</script>
+
+
+<!-- Script Bryan -->
+<script>
+    var arrayCantiEstu = [];
+    function pastelCiclo() {
+        var arrayPosiciones = [];
+        arrayCantiEstu.length = 0;
+        if (idCiclo == 0 || idTipoMod == 0) {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-top messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'You must select a cycle and a module type',
+                type: 'error',
+                hideAfter: 5,
+                showCloseButton: false
+            });
+            return false;
+        }
+        $.ajax({
+            url: "../Reportes/PromediosCalificaciones",
+            type: "POST",
+            data: JSON.stringify({ opcion: 2, idCiclo: idCiclo, idNivel: 0, idParalelo: 0, idTipoModulo: idTipoMod }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (result) {
+                var excelente = 0; var mBueno = 0; var bueno = 0; var regular = 0; var malo = 0;
+                var objEstuCali = {};
+                var estadoCalificacion = "";
+                for (var i = 0; i < result.length; i++) {
+                    estadoCalificacion = consultarEstadoCalificacion(result[i].promedio);
+                    if (estadoCalificacion == "Excellent") {
+                        excelente++;
+                        objEstuCali = { "label": "Excellent", "nombre": result[i].nombres, "promedio": result[i].promedio };
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                    if (estadoCalificacion == "Very Good") {
+                        mBueno++;
+                        objEstuCali = { "label": "Very good", "nombre": result[i].nombres, "promedio": result[i].promedio };
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                    if (estadoCalificacion == "Good") {
+                        bueno++;
+                        objEstuCali = { "label": "Good", "nombre": result[i].nombres, "promedio": result[i].promedio };
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                    if (estadoCalificacion == "Regular") {
+                        regular++;
+                        objEstuCali = { "label": "Regular", "nombre": result[i].nombres, "promedio": result[i].promedio };
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                    if (estadoCalificacion == "Deficient") {
+                        malo++;
+                        objEstuCali = { "label": "Deficient", "nombre": result[i].nombres, "promedio": result[i].promedio };
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                }
+                arrayPosiciones[0] = { "label": "Excellent", "value": excelente };
+                arrayPosiciones[1] = { "label": "Very Good", "value": mBueno };
+                arrayPosiciones[2] = { "label": "good", "value": bueno };
+                arrayPosiciones[3] = { "label": "Regular", "value": regular };
+                arrayPosiciones[4] = { "label": "Deficient", "value": malo };
+                $("#morris-chart-donutCiclo").html("");
+                var morris = Morris.Donut({
+                    element: 'morris-chart-donutCiclo',
+                    data: arrayPosiciones,
+                    resize: true,
+                    colors: ["#92d050", "#46b8e9", "#ffff00", "#f79646", "#ff0000"],
+                });
+                $("#tagsCiclo").find("#Excellent").html("Excellent: " + excelente);
+                $("#tagsCiclo").find("#Verygood").html("Very Good: " + mBueno);
+                $("#tagsCiclo").find("#Good").html("Good: " + bueno);
+                $("#tagsCiclo").find("#Regular").html("Regular: " + regular);
+                $("#tagsCiclo").find("#Deficient").html("Deficient: " + malo);
+                $("#tagsCiclo").css("display", "block");
+            }
+        });
+    }
+
+    function pastelNivel()
+    {
+        var arrayPosiciones = [];
+        arrayCantiEstu.length = 0;
+        if (idCiclo == 0 || idTipoMod == 0 || idNivel == 0) {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-top messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'You must select a cycle, a type of module and a level',
+                type: 'error',
+                hideAfter: 5,
+                showCloseButton: false
+            });
+            return false;
+        }
+        $.ajax({
+            url: "../Reportes/PromediosCalificaciones",
+            type: "POST",
+            data: JSON.stringify({ opcion: 1, idCiclo: idCiclo, idNivel: idNivel, idParalelo: 0, idTipoModulo: idTipoMod }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (result) {
+                var excelente = 0; var mBueno = 0; var bueno = 0; var regular = 0; var malo = 0;
+                var objEstuCali = {};
+                var estadoCalificacion = "";
+                for (var i = 0; i < result.length; i++) {
+                        estadoCalificacion = consultarEstadoCalificacion(result[i].promedio);
+                    if (estadoCalificacion == "Excellent") {
+                        excelente++;
+                        objEstuCali = { "label": "Excellent", "nombre": result[i].nombres, "promedio": result[i].promedio };
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                    if (estadoCalificacion == "Very Good") {
+                        mBueno++;
+                        objEstuCali = { "label": "Very Good", "nombre": result[i].nombres, "promedio": result[i].promedio };
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                    if (estadoCalificacion == "Good") {
+                        bueno++;
+                        objEstuCali = { "label": "Good", "nombre": result[i].nombres, "promedio": result[i].promedio };
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                    if (estadoCalificacion == "Regular") {
+                        regular++;
+                        objEstuCali = { "label": "Regular", "nombre": result[i].nombres, "promedio": result[i].promedio };
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                    if (estadoCalificacion == "Deficient") {
+                        malo++;
+                        objEstuCali = { "label": "Deficient", "nombre": result[i].nombres, "promedio": result[i].promedio };
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                }
+                arrayPosiciones[0] = { "label": "Excellent", "value": excelente };
+                arrayPosiciones[1] = { "label": "Muy Buena", "value": mBueno };
+                arrayPosiciones[2] = { "label": "Buena", "value": bueno };
+                arrayPosiciones[3] = { "label": "Regular", "value": regular };
+                arrayPosiciones[4] = { "label": "Malo", "value": malo };
+                $("#morris-chart-donutNivel").html("");
+                var morris = Morris.Donut({
+                    element: 'morris-chart-donutNivel',
+                    data: arrayPosiciones,
+                    resize: true,
+                    colors: ["#92d050", "#46b8e9", "#ffff00", "#f79646", "#ff0000"],
+                });
+                $("#tagsNivel").find("#Excellent").html("Excellent: " + excelente);
+                $("#tagsNivel").find("#Verygood").html("Very Good: " + mBueno);
+                $("#tagsNivel").find("#Good").html("Good: " + bueno);
+                $("#tagsNivel").find("#Regular").html("Regular: " + regular);
+                $("#tagsNivel").find("#Deficient").html("Deficient: " + malo);
+                $("#tagsNivel").css("display", "block");
+            }
+        });
+    }
+
+    function pastelParalelo(me) {
+        var numParal = $(me).data("value");
+        var arrayPosiciones = [];
+        arrayCantiEstu.length = 0;
+        $.ajax({
+            url: "../Reportes/PromediosCalificaciones",
+            type: "POST",
+            data: JSON.stringify({ opcion: 3, idCiclo: idCiclo, idNivel: idNivel, _numParalelo: numParal, idTipoModulo: idTipoMod }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (result) {
+                var excelente = 0; var mBueno = 0; var bueno = 0; var regular = 0; var malo = 0;
+                var objEstuCali = {};
+                var estadoCalificacion = "";
+
+                for (var i = 0; i < result.length; i++) {
+                    estadoCalificacion = consultarEstadoCalificacion(result[i].promedio);
+                    if (estadoCalificacion == "Excellent") {
+                        excelente++;
+                        objEstuCali = {"label":"Excellent","nombre":result[i].nombres,"promedio":result[i].promedio};
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                    if (estadoCalificacion == "Very Good") {
+                        mBueno++;
+                        objEstuCali = { "label": "Very Good", "nombre": result[i].nombres, "promedio": result[i].promedio };
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                    if (estadoCalificacion == "Good") {
+                        bueno++;
+                        objEstuCali = {"label":"Good","nombre":result[i].nombres,"promedio":result[i].promedio};
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                    if (estadoCalificacion == "Regular") {
+                        regular++;
+                        objEstuCali = {"label":"Regular","nombre":result[i].nombres,"promedio":result[i].promedio};
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                    if (estadoCalificacion == "Deficient") {
+                        malo++;
+                        objEstuCali = {"label":"Deficient","nombre":result[i].nombres,"promedio":result[i].promedio};
+                        arrayCantiEstu.push(objEstuCali);
+                    }
+                }
+                arrayPosiciones[0] = { "label": "Excellent", "value": excelente };
+                arrayPosiciones[1] = { "label": "Very Good", "value": mBueno };
+                arrayPosiciones[2] = { "label": "Good", "value": bueno };
+                arrayPosiciones[3] = { "label": "Regular", "value": regular };
+                arrayPosiciones[4] = { "label": "Deficient", "value": malo };
+                $("#morris-chart-donutParalelo").html("");
+                var morris = Morris.Donut({
+                    element: 'morris-chart-donutParalelo',
+                    data: arrayPosiciones,
+                    resize: true,
+                    colors: ["#92d050", "#46b8e9", "#ffff00", "#f79646", "#ff0000"],
+                });
+                $("#tagsPara").find("#Excellent").html("Excellent: " + excelente);
+                $("#tagsPara").find("#Verygood").html("Very Good: " + mBueno);
+                $("#tagsPara").find("#Good").html("Good: " + bueno);
+                $("#tagsPara").find("#Regular").html("Regular: " + regular);
+                $("#tagsPara").find("#Deficient").html("Deficient: " + malo);
+                $("#tagsPara").css("display", "block");
+            }
+        });
+    }
+
+    function modalCali(me) {
+        var posicion = me.id;
+        $("#tBodyCalificaciones").html("");
+        for (var i = 0; i < arrayCantiEstu.length; i++) {
+            if (posicion == arrayCantiEstu[i].label) {
+                $("#tBodyCalificaciones").append('<tr><td>' + arrayCantiEstu[i].nombre + '</td><td>' + arrayCantiEstu[i].promedio + '</td></tr>');
+            }
+        }
+        $("#modalAsignar").modal("show");
+    }
+    var idModu;
+    function crearTabla(me) {
+        var numPara = $(me).data("value");
+        $.ajax({
+            url: "../Administrador/promediosXModulo",
+            type: "POST",
+            data: JSON.stringify({ _idTipoModulo: idTipoMod, _ciclo: idCiclo, _nivel: idNivel, _numPara: numPara }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (data) {
+                $("#tBodyTablaProme").html("");
+                if(data.lecciones.length==0)
+                {
+                    $("#tHeadtablaProme").html('<tr><th>There is not activities asigned in this modul.</th></tr>');
+                }                
+                else{
+                    idModu = data.idModu;
+                    var result = data.listARE;
+                    var listaLecciones = "";
+                    for (var i = 0; i < data.lecciones.length; i++) {
+                        listaLecciones = listaLecciones + "<th>" + data.lecciones[i].numLeccion + "</th>";
+                    }
+                    $("#tBodyTablaProme").html("");
+                    $("#tHeadtablaProme").html('<tr><th rowspan="2">#</th><th rowspan="2">Names</th><th rowspan="2">Resolved Activities</th><th colspan="' + result[0].objProLecc.length + '" style="text-align: right">Lessons</th><th rowspan="2">Total</th><th rowspan="2">State</th><th rowspan="2">Effectiveness</th></tr><tr>' + listaLecciones + '</tr>');
+                    var cont = 0;
+                    for (var i = 0; i < result.length; i++) {
+                        cont = cont + 1;
+                        $("#tBodyTablaProme").append('<tr id="alum' + result[i].idAlumno + '"></tr>');
+                        $('#alum' + result[i].idAlumno).append('<td style="text-align:right">' + cont + '</td>');
+                        $('#alum' + result[i].idAlumno).append('<td style="text-align:left">' + result[i].nombres + '</td>');
+                        $('#alum' + result[i].idAlumno).append('<td>' + result[i].cantidadActiResu + '</td>');
+                        var prom = 0;
+                        var estadoCalificacion = "";
+                        for (var j = 0; j < result[i].objProLecc.length; j++) {
+                            prom = prom + result[i].objProLecc[j].valor;
+                            $('#alum' + result[i].idAlumno).append('<td style="text-align: right">' + result[i].objProLecc[j].valor + '</td>');
+                        }
+                        $('#alum' + result[i].idAlumno).append('<td style="text-align: right">' + redondeaDecimales(prom / result[i].objProLecc.length, 2) + '</td>');
+                        estadoCalificacion = consultarEstadoCalificacion(redondeaDecimales(prom / result[i].objProLecc.length, 2));
+                        $('#alum' + result[i].idAlumno).append('<td>' + estadoCalificacion + '</td>');
+                        if (prom != 0) {
+                            $('#alum' + result[i].idAlumno).append('<td><a class="btn btn-orange btn-xs" href="#" onclick="efectividad(' + result[i].idAlumno + ')">View</a></td>');
+                        } else {
+                            $('#alum' + result[i].idAlumno).append('<td><a class="btn btn-orange btn-xs disabled">View</a></td>');
+                        }
+
+                    }
+                }
+                
+            }
+        });
+    }
+
+    function efectividad(idEstud) {
+        $("#chart-bar1").html("");
+        var idModulo = $("#selectModulo").val();
+        $.ajax({
+            url: "../Reportes/efectividad",
+            type: "POST",
+            data: JSON.stringify({ idEstudiante: idEstud, idModulo: idModu }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (result) {
+                
+                efectividadAlumno(result.data)
+            }
+
+        });
+    }
+
+    function efectividadAlumno(result)
+    {
+        if(result.length !=0)
+        {
+            var MorrisBar = Morris.Bar({
+                element: 'chart-bar1',
+                data: result,
+                xkey: 'tipoEfectividad',
+                ykeys: ['porcentaje'],
+                labels: ['Percent'],
+                postUnits: '%',
+                hideHover: 'auto',
+                goals: [100],
+                resize: true,
+                xLabelFormat: function (d) {
+                    return d.src.tipoEfectividad;
+                },
+                barColors: ["#f39c12"],
+                hoverCallback: function (index, options, content, row) {
+                    return content;
+                }
+            });
+
+        }
+        $("#modalEfectividad").modal("show");
+    }
+</script>
+<!-- /Bryan -->

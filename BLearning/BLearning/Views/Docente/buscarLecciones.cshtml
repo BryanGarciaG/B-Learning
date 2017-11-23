@@ -1,0 +1,232 @@
+﻿@using BLearning.Models.Negocio;
+@{
+    ViewBag.Title = "Lessons";
+    int cantLeccion = 0;
+    List<EstudiantePromedioEntidad> listaPosiciones = (List<EstudiantePromedioEntidad>)ViewBag.posiciones;
+    //List<EstudiantePromedioEntidad> listaPosiciones = (List<EstudiantePromedioEntidad>)ViewBag.posicionesOrd;
+    LogicEncriptacionMetodos _objEncrypt = new LogicEncriptacionMetodos();
+    string numM = ViewBag.nunModulo;
+    int idModulo = ViewBag.idModulo;
+}
+@model List<LeccionEntidad>
+
+<!-- begin PAGE TITLE AREA -->
+<!-- Use this section for each page's title and breadcrumb layout. In this example a date range picker is included within the breadcrumb. -->
+@{
+    List<string> listColores = new List<string>();
+    listColores.Add("color1");
+    listColores.Add("color2");
+    int numColor = 0;
+
+}
+<style media="screen" type="text/css">
+    .text-faded {
+        color: #fff;
+    }
+
+    .color1 {
+        background-color: #16a085;
+    }
+
+    .color2 {
+        background-color: #2fcbb5;
+    }
+</style>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="page-title">
+            <h1>
+                Lessons
+                <small></small>
+            </h1>
+            <ol class="breadcrumb">
+                <li class="active"><i class="fa fa-dashboard"></i> Module @ViewBag.nunModulo</li>
+                <li class="pull-right">
+                    <a href="#" onclick="history.back();" class="btn btn-red btn-square date-picker"><i class="fa fa-chevron-circle-left"><span> Back</span></i></a>
+                </li>
+            </ol>
+        </div>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<div class="row">
+    <div class="col-lg-8 left">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="portlet portlet-default">
+                    <div class="portlet-heading">
+                        <div class="portlet-title">
+                            <h4><i class="fa fa-briefcase text-yellow"></i> Lessons</h4>
+                        </div>
+                        <div class="clearfix">
+                        </div>
+                    </div>
+                    <div class="portlet-body">
+                        <br />
+                        <div class="row">
+                            <div class="col-md-12">
+                                @foreach (var item in Model)
+                                {
+                                    cantLeccion++;
+                                    if (numColor == 2)
+                                    {
+                                        numColor = 0;
+                                    }
+                                    <div class="col-lg-3 col-sm-6 col-xs-6">
+                                        <div class="circle-tile" style="margin-bottom: 15px;">
+                                            <!--aqui a;adir en variable encrictada el id del modulo-->
+                                            <a href="@Url.Action("buscarActivi", "Docente", new { @area = "", idLeccionEn = _objEncrypt.Encrypt(item.idLeccion.ToString()), numLeccion = _objEncrypt.Encrypt(item.numLeccion), numModu = _objEncrypt.Encrypt(numM), idModuloEn = _objEncrypt.Encrypt(idModulo.ToString()) })">
+
+                                            </a>
+                                            <div class="circle-tile-content @listColores[numColor]" style="padding-top: 25px;">
+                                                <div class="circle-tile-description text-faded" style="font-size: 14px;">
+                                                    Lesson @cantLeccion
+                                                </div>
+                                                <div class="circle-tile-number text-faded" style="font-size: 17px;">@item.cantActiAsig Activities</div>
+                                                <a href="@Url.Action("buscarActivi", "Docente", new { @area = "", idLeccionEn = _objEncrypt.Encrypt(item.idLeccion.ToString()), numLeccion = _objEncrypt.Encrypt(item.numLeccion), numModu = _objEncrypt.Encrypt(numM), idModuloEn = _objEncrypt.Encrypt(idModulo.ToString()) })" class=" circle-tile-footer">More <i class="fa fa-chevron-circle-right"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    numColor++;
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+
+    <div class="col-lg-4 right">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="portlet portlet-default">
+                    <div class="portlet-heading">
+                        <div class="portlet-title ">
+                            <h4><i class="fa fa-certificate text-yellow fa-lg"></i> Best students</h4>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="portlet-body chat-widget" style="overflow: hidden; width: auto; height: 280px;">
+
+                        <div class="row">
+                            @if (listaPosiciones.Count == 0)
+                            {
+                                <div class="col-lg-12">
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <p class="text-center text-muted">No data</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class=" col-sm-12">
+                                    <div class="table-responsive">
+                                        <table id="tablaPormedios" class="table table-condensed table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Names</th>
+                                                    <th>Score</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tBodyTablaProme"></tbody>
+                                            @for (int i = 0; i < listaPosiciones.Count; i++)
+                                            {
+                                            <tr id="@listaPosiciones[i].idEstudiante">
+                                                <td>@listaPosiciones[i].nombres</td>
+                                                <td>@listaPosiciones[i].promedio</td>
+                                            </tr>
+                                            }
+
+                                        </table>
+                                    </div>
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+                    <div class="portlet-footer">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <a href="@Url.Action("Ver","Reportes")" class="btn btn-success pull-left"><i class="fa fa-bar-chart-o fa-lg"></i></a>
+                                <a href="#" data-toggle="modal" data-target="#modalPosicionTodos" class="btn btn-orange pull-right">View full table</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- /.col-lg-12 -->
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalPosicionTodos" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width:60%" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-darrk-blue-o">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">List of students</h4>
+                </div>
+                <div class="modal-body">
+                    <div class=" row">
+                        <div class=" col-lg-12">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered table-hover table-green">
+                                    <thead>
+                                        <tr role="row">
+                                            <th>Names</th>
+                                            <th>Score</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int i = 0; i < listaPosiciones.Count; i++)
+                                        {
+                                            <tr id="@listaPosiciones[i].idEstudiante">
+                                                <td>@listaPosiciones[i].nombres</td>
+                                                <td>@listaPosiciones[i].promedio</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+
+                                <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content ui-corner-all" id="ui-id-1" tabindex="0" style="display: none; min-width: 98px; z-index: 100001; width: 112px; top: 188px; left: 300px;">
+                                    <li class="ui-menu-item" role="presentation">
+                                        <a id="ui-id-2" class="ui-corner-all" tabindex="-1">red</a>
+                                    </li>
+                                    <li class="ui-menu-item" role="presentation">
+                                        <a id="ui-id-3" class="ui-corner-all" tabindex="-1">blue</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>   
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+

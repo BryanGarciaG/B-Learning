@@ -1,0 +1,37 @@
+﻿@using BLearning.Models.Negocio;
+
+@{
+    
+    List<DocenteCursosEntidad> cursos = (List<DocenteCursosEntidad>)Session["cursos"];
+    int cantCursos = 0;
+    if (cursos != null)
+    {
+        cantCursos = cursos.Count();
+        
+    }
+    LogicEncriptacionMetodos _objEncrypt = new LogicEncriptacionMetodos();
+    
+}
+
+
+    
+
+
+
+<a href="javascript:;" data-parent="#side" data-toggle="collapse" class="accordion-toggle" data-target="#chartsM">
+    <i class="fa fa-dashboard fa-lg"></i> Modules <i class="fa fa-caret-down"></i>
+</a>
+<ul class="collapse nav" id="chartsM">
+    @foreach (var item in cursos)
+    {
+        <li>
+            <a href="@Url.Action("buscarLecciones", "Docente", new { @area = "", idNivelEn = _objEncrypt.Encrypt(item.idNivel.ToString()), modulo = _objEncrypt.Encrypt(item.numNivel + "" + item.numParalelo), idModuloEn = _objEncrypt.Encrypt(item.idModulo.ToString()) })">
+                <i class="fa fa-angle-double-right"></i> @item.numNivel@item.numParalelo
+            </a>
+            
+        </li>
+    }
+</ul>
+
+
+    

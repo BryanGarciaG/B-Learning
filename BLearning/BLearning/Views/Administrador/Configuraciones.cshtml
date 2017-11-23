@@ -1,0 +1,120 @@
+﻿@using BLearning.Models.Negocio
+@{
+    ViewBag.Title = "Configurations";
+
+    Layout = "~/Views/Shared/_LayoutAdministrador.cshtml";
+}
+@model List<LeccionesXNivelEntidad>
+<!-- begin PAGE TITLE AREA -->
+<!-- Use this section for each page's title and breadcrumb layout. In this example a date range picker is included within the breadcrumb. -->
+<div class="row">
+    <div class="col-lg-12">
+
+        <div class="page-title">
+            <h1>
+                General configurations
+            </h1>
+            <ol class="breadcrumb">
+                <li class="active"><i class="fa fa-cogs"></i> Configurations</li>
+            </ol>
+        </div>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="portlet portlet-default">
+            <div class="portlet-heading">
+                <div class="portlet-title">
+                    <h4><i class="fa fa-exchange fa-fw"></i> Lessons configured</h4>
+                </div>
+                <div class="portlet-widgets">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#transactionsPortlet"><i class="fa fa-chevron-down"></i></a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div id="transactionsPortlet" class="panel-collapse collapse in">
+                <div class="portlet-body">
+                    
+                    <div class="table-responsive dashboard-demo-table">
+                        <table class="table table-bordered table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Level</th>
+                                    <th>Lessones Asigned</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr id="@item.idNivel">
+                                        <td id="">@item.idNivel</td>
+                                        <td id="cantLecc">@item.cantLecciones</td>
+                                        <td id="btns">
+                                            <a id="btn-edit" class="btn btn-xs btn-blue" onclick="editarNumLeccion(@item.idNivel)"><i class="fa fa-edit"></i> Edit</a>
+                                        </td>
+                                    </tr>
+                                    
+                                }
+                            </tbody>
+                            
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+
+<script>
+    var can = 0;
+    function editarNumLeccion(idNivel) {
+        can = parseInt($("#" + idNivel).find("#cantLecc").html());
+        $("#" + idNivel).find("#cantLecc").html('<input id="inp' + idNivel + '" value="' + can + '"  type="number" min="1"/>');
+        $("#" + idNivel).find("#btns").html('<a id="btn-save" class="btn btn-xs btn-success" onclick="actuaizarLeccionesXnivel(' + idNivel + ')"><i class="fa fa-save"></i> Save</a>'
+            + '<a id="btn-cancel" class="btn btn-xs btn-red" onclick="cancelar(' + idNivel + ')"><i class="fa fa-mail-reply"></i> Cancelar</a>');
+
+       
+    }
+    function cancelar(idNivel) {
+        $("#" + idNivel).find("#cantLecc").html(can);
+        $("#" + idNivel).find("#btns").html('<a id="btn-edit" class="btn btn-xs btn-green" onclick="editarNumLeccion(' + idNivel + ')"><i class="fa fa-edit"></i> Edit</a>')
+
+       
+    }
+
+    function actuaizarLeccionesXnivel(nivel) {
+        var idNivel = nivel;
+        var canLec = $("#"+idNivel).find("#inp"+idNivel).val();
+        if (parseInt(canLec) < 1) {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-top messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'Cada nivel debe tener por o menos una leccion',
+                type: 'error',
+                hideAfter: 5,
+                showCloseButton: false
+            });
+            return false;
+        }
+        $.ajax({
+            url: "../Administrador/actualizarLeccionesActivas",
+            type: "POST",
+            data: JSON.stringify({ idNivel: idNivel, cantLeccion: canLec }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (result) {
+                $("#"+idNivel).find("#cantLecc").html(canLec);
+                $("#" + idNivel).find("#btn-edit").css("display", "block");
+                $("#" + idNivel).find("#btn-save").css("display", "none");
+                $("#" + idNivel).find("#btn-cancel").css("display", "none");
+            }
+        });
+    }
+</script>

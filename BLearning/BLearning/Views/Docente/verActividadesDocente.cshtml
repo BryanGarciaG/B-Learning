@@ -1,0 +1,769 @@
+﻿@using BLearning.Models.Negocio
+@using Newtonsoft.Json;
+
+@model VariosModel
+
+@{
+    ViewBag.Title = "Activities";
+    List<DocenteCursosEntidad> cursos = (List<DocenteCursosEntidad>)Session["cursos"];
+    LogicEncriptacionMetodos _objEncrip = new LogicEncriptacionMetodos();
+    var hoy = DateTime.Now.ToString("yyyy-MM-dd");
+
+}
+
+
+
+
+<link href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet" />
+@Styles.Render("~/Content/bootstrap-select.css")
+@Styles.Render("~/Content/plugins/datatables/datatables.css")
+@Styles.Render("~/Content/plugins/datatables/jquery.dataTables.min.css")
+
+<!-- begin PAGE TITLE AREA -->
+<!-- Use this section for each page's title and breadcrumb layout. In this example a date range picker is included within the breadcrumb. -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="page-title">
+            <h1>
+                Content Activities
+            </h1>
+            <ol class="breadcrumb">
+                <li>
+                    <i class="fa fa-book"></i><a href="#" onclick="return false;"> Activities</a>
+                </li>
+            </ol>
+
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class="portlet portlet-default">
+            <div class="portlet-heading">
+                <div class="portlet-title">
+                    <h4>My activities</h4>
+                </div>
+                <div class=" portlet-widgets">
+                    <a href="@Url.Action("crearPreguntas", "Docente", new { @area = ""})" class=" btn btn-orange"><span class="fa fa-plus-square"></span> &nbsp; New activity</a>
+                    &nbsp;
+                    <a data-toggle="collapse" data-parent="#accordion" href="#myActCollapse" class=""><i class="fa fa-chevron-down"></i></a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div id="myActCollapse" class=" panel-collapse in">
+                <div class="portlet-body">
+                    <div id="myPillsContent" class="tab-content">
+                        <div class="tab-pane fade  active in" id="practicas">
+                            <div class=" row">
+                                <div class="col-lg-12">
+                                    <div class="table-responsive">
+                                        <div id="example-table_wrapper" class="dataTables_wrapper form-inline" role="grid">
+                                            <table id="tabla-MyActi" class="table table-striped table-bordered table-hover table-condensed dataTable" aria-describedby="example-table_info">
+                                                <thead>
+                                                    <tr role="row">
+                                                        <th class="sorting_asc" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 25%;">Topic</th>
+                                                        <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 8%;">Level</th>
+                                                        <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="height: auto; width: 25%">Skills</th>
+                                                        <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 10%;">Duration</th>
+                                                        <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 10%;">Questions</th>
+                                                        <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 10%;">Created</th>
+                                                        <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 10%;">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody role="alert" aria-live="polite" aria-relevant="all">
+                                                    @foreach (var item in Model.listaActXDoc)
+                                                    {
+
+                                                        <tr class="gradeA odd">
+                                                            <td class=" ">
+                                                                <a data-idacti="@item.idActividad" href="@Url.Action("revisarActividad", new { @area = "", idActiv = item.idActividad, tema = item.descripcion, nuNivel  = item.idNivel})">@item.descripcion</a>
+                                                            </td>
+                                                            <td>@item.idNivel</td>
+                                                            <td>@item.Destrezas</td>
+                                                            <td class=" ">@item.duracion min</td>
+                                                            <td class="center ">@item.nPreguntas</td>
+                                                            <td class="center ">@item.fechaCreacion.ToString("d")</td>
+                                                            @if (item.isReportad == 1)
+                                                            {
+                                                                <td class="center ">In review</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td>
+                                                                    <div class="btn-group">
+                                                                        <button type="button" class="btn btn-xs btn-green dropdown-toggle" data-toggle="dropdown">
+                                                                            Actions
+                                                                            <span class="caret"></span>
+                                                                        </button>
+                                                                        <ul class="dropdown-menu pull-right" role="menu">
+                                                                            @if (cursos.Any(c => c.idNivel == item.idNivel))
+                                                                            {
+                                                                                <li>
+                                                                                    <a data-idacti="@item.idActividad" data-idnivel="@item.idNivel" onclick=" modalAsignar(this); return false" href="#">Assign</a>
+                                                                                </li>
+                                                                            }
+                                                                            <li>
+                                                                                <a data-idac="@item.idActividad" href="#" onclick="verActi(this)">View</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a data-idacti="@item.idActividad" href="@Url.Action("revisarActividad", new { @area = "", idActiv = item.idActividad, tema = item.descripcion,nuNivel = item.idNivel })">Edit</a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a onclick="msgElimnarActi(@item.idActividad); return false;" href="#">Delete</a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </td>
+                                                            }
+
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="portlet portlet-default">
+            <div class="portlet-heading">
+                <div class="portlet-title">
+                    <h4>Shared activities</h4>
+                </div>
+                <div class=" portlet-widgets">
+                    <div class="btn-group">
+                        <button id="btnNivel" type="button" class="btn btn-orange dropdown-toggle" data-toggle="dropdown">
+                            Choose
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu pull-right" role="menu">
+                            @foreach (var item in cursos)
+                            {
+                                <li>
+                                    <a onclick="actiXNivel(@item.idNivel); return false" href="#">Level @item.idNivel</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="portlet-body">
+                <div id="myPillsContent" class="tab-content">
+                    <div class="tab-pane fade  active in" id="practicas">
+                        <div class=" row">
+                            <div class="col-lg-12">
+                                <div id="ActiNivelTable" class="table-responsive">
+                                    <div id="example-table_wrapper" class="dataTables_wrapper form-inline" role="grid">
+                                        <table id="tabla-Xnivel" class="table table-striped table-bordered table-hover dataTable" aria-describedby="example-table_info">
+                                            <thead>
+                                                <tr role="row">
+                                                    <th class="sorting_asc" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 263px;">Title</th>
+                                                    <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 263px;">Teacher</th>
+                                                    <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 263px;">Abilities</th>
+                                                    <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 10%;">Duration</th>
+                                                    <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 10%;">Questions</th>
+                                                    <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 10%;">Created</th>
+                                                    <th class="sorting" role="columnheader" tabindex="0" rowspan="1" colspan="1" style="width: 10%;">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="ActiNivelTBody" role="alert" aria-live="polite" aria-relevant="all">
+                                                <tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Select a level</td></tr>
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <br />
+        <br />
+    </div>
+
+    <!-- begin asignar actividad modal -->
+    <div class="modal fade" id="modalAsignar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width:60%" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-darrk-blue-o">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">Assignment of activities</h4>
+                </div>
+                <div class="modal-body">
+                    <div class=" row">
+                        <div class=" col-lg-12">
+                            <div class="table-responsive">
+                                <table id="tablaDependencia" class="table table-striped table-bordered table-hover table-condensed">
+                                    <thead>
+                                        <tr role="row">
+                                            <th>Assigned Courses</th>
+                                            <th>Assign as</th>
+                                            <th>
+                                                Available from
+                                            </th>
+                                            <th>
+                                                Available until
+                                            </th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td id="selectMyActi">
+                                                <select class="selectpicker" id="selectMyActi2" data-style="btn-warning" data-width="100%"></select>
+                                            </td>
+                                            <td>
+                                                <select id="tipoAct" class="selectpicker" data-style="btn-warning" data-width="100%">
+                                                    <option>Practice</option>
+                                                    <option>Evaluative</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="date" value="@hoy" onkeydown="return false" onchange=" comprobarFechas()" required min="@hoy" id="desde" class="form-control" />
+                                                <style media="screen" type="text/css">
+                                                    input[type=date]::-webkit-inner-spin-button {
+                                                        -webkit-appearance: none;
+                                                        display: none;
+                                                    }
+                                                </style>
+                                            </td>
+                                            <td>
+                                                <input type="date" onkeydown="return false" value="@hoy" min="@hoy" id="hasta" required class="form-control" />
+                                            </td>
+                                            <td>
+                                                <button type="button" onclick="obtenerModulosAsignados()" class="btn btn-green btn-xs ">
+                                                    Assign
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody id="tBodyAsignar"></tbody>
+                                </table>
+
+                                <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content ui-corner-all" id="ui-id-1" tabindex="0" style="display: none; min-width: 98px; z-index: 100001; width: 112px; top: 188px; left: 300px;">
+                                    <li class="ui-menu-item" role="presentation">
+                                        <a id="ui-id-2" class="ui-corner-all" tabindex="-1">red</a>
+                                    </li>
+                                    <li class="ui-menu-item" role="presentation">
+                                        <a id="ui-id-3" class="ui-corner-all" tabindex="-1">blue</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end nueva actividad modal -->
+    
+</div>
+
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="modalGif" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:60%" role="document">
+        <div id="contenedor">
+            <div class="loader" id="loader">Loading...</div>
+        </div>
+    </div>
+</div>
+<script>
+    var arrayCursosLecciones = [];
+
+    //$(document).ajaxStart(function () {
+    //    $("#modalGif").modal('show');
+    //});
+    //$(document).ajaxStop(function () {
+    //    $("#modalGif").modal('hide');
+    //    $('body').removeClass('modal-open');
+    //    $('.modal-backdrop').remove();
+    //});
+</script>
+
+@{
+    foreach (var item in cursos)
+    {
+        foreach (var item2 in Model.listaLeccion)
+        {
+            if (item2.idNivel == item.idNivel)
+            {
+                <script>
+                    var objCursos = { moduloLeccion: '@item.numNivel@item.numParalelo@item2.numLeccion', idNivel: '@item.idNivel', idModulo: '@item.idModulo', idLeccion: '@item2.idLeccion' };
+                    arrayCursosLecciones.push(objCursos);
+                </script>
+            }
+        }
+
+    }
+}
+
+
+<script>
+    $(document).ready(function () {
+
+        $('#tabla-MyActi').DataTable({
+        });
+    });
+    var idActividad;
+    var modulosYa = [];
+    var ponde;
+
+    function modalAsignar(acti) {
+        idActividad = acti.dataset.idacti;
+        var idNivel = acti.dataset.idnivel;
+        moduloSelNow = '';
+        $("#selectMyActi2").html("");
+        modulosYa.length = 0;
+        comprobarPonderacion(idActividad);
+        if (ponde < 100) {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-top messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'This activity can not be assigned because its score is not equal to 100.',
+                type: 'error',
+                hideAfter: 5,
+                showCloseButton: false
+            });
+            return false;
+        }
+        $.ajax({
+            url: "../Docente/buscarModuXActividad",
+            data: { _idActidad: idActividad },
+            type: 'POST',
+            dataType: 'json',
+            success: function (json) {
+                var tbody = $("#tBodyAsignar");
+                tbody.children().remove();
+                if (!($.isEmptyObject(json))) {
+                    $.each(json, function (i, item) {
+                        modulosYa.push(item.numNivel + item.numPara);
+                        tbody.append('<tr id="asig' + item.idActModulo + '"><td>' + item.numNivel + item.numPara + item.numLeccion + '</td>'
+                            + '<td>' + item.tipo + '</td><td>' + item.fechaInicio + '</td><td id="fin">' + item.fechaFin + '</td><td><div class="btn-group">'
+                            + '<button type="button" class="btn btn-green btn-xs dropdown-toggle" data-toggle="dropdown">'
+                            + 'Actions<span class="caret"></span></button><ul class="dropdown-menu pull-right" role="menu"><li >'
+                            + '<a data-num="' + item.idActModulo + '" onclick="editarAsignacion(this);return false" href="#">Modify</a>'
+                            + '</li><li><a onclick="msgElimnarAsig(' + item.idActModulo + ');return false" href="#">Delete</a></li></ul></div></td></tr>');
+                    });
+                }
+                var con = 0;
+                for (var j = 0; j < arrayCursosLecciones.length; j++) {
+                    if (arrayCursosLecciones[j].idNivel == idNivel) {
+                        $("#selectMyActi2").append('<option>' + arrayCursosLecciones[j].moduloLeccion + '</option>');
+                        con++;
+                    }
+                }
+                $('#selectMyActi2').selectpicker('refresh');
+                $("#modalAsignar").modal('show');
+            }
+        });
+    }
+    function obtenerModulosAsignados() {
+        var cursosSelec = $("#selectMyActi2").val();
+        var arrayModulosId = [];
+        var arrayLeccionesId = [];
+        if (cursosSelec == null) {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-top messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'You have not selected any modules to assign',
+                type: 'error',
+                hideAfter: 3,
+                showCloseButton: false
+            });
+            return false;
+        }
+        var moduloSel = cursosSelec.substr(0, 4);
+        var pass
+        if (moduloSel == moduloSelNow) {
+            pass = false;
+        }
+        for (var i = 0; i < modulosYa.length; i++) {
+            if (modulosYa[i] == moduloSel) {
+                pass = false;
+                break;
+            }
+        }
+        if (pass == false) {
+            Messenger.options = {
+                extraClasses: 'messenger-fixed messenger-on-top messenger-on-right',
+                theme: 'flat'
+            }
+            Messenger().post({
+                message: 'The activity is already assigned to this module',
+                type: 'error',
+                hideAfter: 3,
+                showCloseButton: false
+            });
+            return false;
+        }
+        for (var i = 0; i < arrayCursosLecciones.length; i++) {
+            if (arrayCursosLecciones[i].moduloLeccion == cursosSelec) {
+                arrayModulosId.push(arrayCursosLecciones[i].idModulo);
+                arrayLeccionesId.push(arrayCursosLecciones[i].idLeccion);
+            }
+        }
+        enviarAsignacion(arrayModulosId, arrayLeccionesId)
+    }
+    var moduloSelNow;
+    function enviarAsignacion(moduloArray, leccArray) {
+        var cursosSelec = $("#selectMyActi2").val();
+        moduloSelNow = cursosSelec.substr(0, 4);
+        var tipoAsig = $("#tipoAct").val();
+        var desde = document.getElementById("desde").value;
+        var hasta = document.getElementById("hasta").value;
+        var tipoAct = document.getElementById("tipoAct").value;
+        var actModu = new Object();
+        actModu = {
+            "modelActiModulo.fechaInicio": desde,
+            "modelActiModulo.fechaFin": hasta,
+            "modelActiModulo.idActividad": idActividad,
+            "modelListaModu": moduloArray,
+            "modelListaLecc": leccArray,
+            "modelActiModulo.tipo": tipoAct
+        }
+
+        $.ajax({
+            url: "../Docente/asignarActividades",
+            type: 'POST',
+            data: JSON.stringify({ actModu: actModu }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (data) {
+                var tBody = document.getElementById("tBodyAsignar");
+
+                $.each(data, function (i, item) {
+                    tBody.insertAdjacentHTML("afterbegin", '<tr id="asig' + item + '"><td>' + cursosSelec + '</td>'
+                            + '<td>' + tipoAsig + '</td><td>' + desde + '</td><td id="fin">' + hasta + '</td><td><div class="btn-group">'
+                            + '<button type="button" class="btn btn-green btn-xs dropdown-toggle" data-toggle="dropdown">'
+                            + 'Actions<span class="caret"></span></button><ul class="dropdown-menu pull-right" role="menu"><li>'
+                            + '<a data-num="' + item + '" onclick="editarAsignacion(this);return false" href="#">Modify</a>'
+                            + '</li><li><a onclick="msgElimnarAsig(' + item + ');return false" href="#">Delete</a></li></ul></div></td></tr>');
+                });
+                Messenger.options = {
+                    extraClasses: 'messenger-fixed messenger-on-top messenger-on-right',
+                    theme: 'flat'
+                }
+                Messenger().post({
+                    message: 'Successful assignment!',
+                    type: 'success',
+                    hideAfter: 3,
+                    showCloseButton: false
+                });
+            },
+            beforeSend: function () {
+                $("#modalGif").modal('show');
+            },
+            complete: function () {
+                $("#modalGif").modal('hide');
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+            }
+        });
+    }
+
+
+    function actiXNivel(nivel) {
+        var idNivel = nivel;
+        if (idNivel == '0') {
+            return false;
+        }
+        $.ajax({
+            url: "../Docente/buscarActiXNivel",
+            data: JSON.stringify({ _idNivel: idNivel }),
+            type: 'POST',
+            contentType: 'application/json',
+            processData: false,
+            success: function (json) {
+                $("#btnNivel").html('Level ' + idNivel + ' <span class="caret"></span>')
+                $("#ActiNivelTBody").html("");
+                if (json.length == 0) {
+                    $("#ActiNivelTBody").append('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">No activities to show</td></tr>');
+                    return false;
+                }
+                $.each(json, function (i, item) {
+                    if (item.isReportad == 1) {
+                        $("#ActiNivelTBody").append('<tr><td>' + item.descripcion + '</td><td>' + item.docente + '</td><td>' + item.Destrezas + '</td>'
+                        + '<td>' + item.duracion + '</td><td>' + item.nPreguntas + '</td><td>' + item.creada + '</td><td>'
+                        + 'In review</td></tr>');
+
+                    }
+                    else {
+                        $("#ActiNivelTBody").append('<tr><td>' + item.descripcion + '</td><td>' + item.docente + '</td><td>' + item.Destrezas + '</td>'
+                        + '<td>' + item.duracion + '</td><td>' + item.nPreguntas + '</td><td>' + item.creada + '</td><td>'
+                        + '<div class="btn-group">'
+                            + '<button type="button" class="btn btn-green btn-xs dropdown-toggle" data-toggle="dropdown">'
+                            + 'Actions<span class="caret"></span></button><ul class="dropdown-menu pull-right" role="menu"><li >'
+                            + '<a data-idac="' + item.idActividad + '" data-des="' + item.descripcion + '"  onclick="verActi(this);" href="#">View</a>'
+                            + '</li><li><a data-idacti="' + item.idActividad + '" data-idnivel="' + item.idNivel + '" onclick=" modalAsignar(this); return false" href="#">Assign</a></li></ul></div></td></tr>');
+                    }
+                });
+            },
+            beforeSend: function () {
+                $("#modalGif").modal('show');
+            },
+            complete: function () {
+                $("#modalGif").modal('hide');
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+            }
+        });
+    }
+    function verActi(me) {
+        location.href = '../Docente/verActividad?idA=' + encodeURIComponent($(me).data("idac"));
+        @*var idAc = $(me).data("idac");
+        var idAcEn = '@_objEncrip.Encrypt("varReplace")';
+        idAcEn = idAcEn.replace("varReplace", idAc);
+        location.href = '/Docente/verActividad?idAEn=' + idAcEn;*@
+    }
+    function editarAsignacion(me) {
+        var hoy = '@hoy';
+        var who = $(me).data("num");
+        $("#asig" + who).find("#fin").html('<input id="nuevoFin" onkeydown="return false" type="date" value="' + hoy + '" min="' + hoy + '" class="form-control" />');
+        $("#asig" + who).find(".btn-group").remove();
+        $("#asig" + who + " td:nth-child(5)").html('<a href="#" data-idasignacion="' + who + '" onclick="guardarAsignacionEditada(this);return false" class="btn btn-orange btn-xs">Save</a>');
+
+    }
+
+    function guardarAsignacionEditada(me) {
+        var who = $(me).data("idasignacion");
+        var fin = $("#asig" + who).find("#nuevoFin").val();
+        var newAsig = new Object();
+        newAsig = {
+            "modelActiModulo.idActModulo": who,
+            "modelActiModulo.fechaFin": fin
+        }
+        $.ajax({
+            url: "../Docente/editarAsignacion",
+            type: 'POST',
+            data: JSON.stringify({ newAsig: newAsig }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (data) {
+                $("#asig" + who + " td:nth-child(5)").children().remove();
+                $("#asig" + who + " td:nth-child(5)").html('<div class="btn-group">'
+                            + '<button type="button" class="btn btn-green btn-xs dropdown-toggle" data-toggle="dropdown">'
+                            + 'Actions<span class="caret"></span></button><ul class="dropdown-menu pull-right" role="menu"><li >'
+                            + '<a data-num="' + who + '" onclick="editarAsignacion(this);return false" href="#">Modify</a>'
+                            + '</li><li><a onclick="msgElimnarAsig(' + who + ');return false" href="#">Delete</a></li></ul></div>');
+                $("#asig" + who).find("#fin").html(convertDateFormat(fin));
+                Messenger.options = {
+                    extraClasses: 'messenger-fixed messenger-on-top messenger-on-right',
+                    theme: 'flat'
+                }
+                Messenger().post({
+                    message: 'Successful edition!',
+                    type: 'success',
+                    hideAfter: 3,
+                    showCloseButton: false
+                });
+            },
+            beforeSend: function () {
+                $("#modalGif").modal('show');
+            },
+            complete: function () {
+                $("#modalGif").modal('hide');
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+            }
+        });
+    }
+    function convertDateFormat(string) {
+        var info = string.split('-');
+        return info[2] + '/' + info[1] + '/' + info[0];
+    }
+    function comprobarFechas() {
+        var desd = new Date();
+        var has = new Date();
+        desd = $("#desde").val();
+        $("#hasta").val(desd).attr("min", desd).show();
+    }
+    function comprobarPonderacion(idActi) {
+        $.ajax({
+            url: "../Docente/actividadPonderacion",
+            data: { _idActividad: idActi },
+            type: 'POST',
+            dataType: 'json',
+            async: false,
+            success: function (json) {
+                ponde = json;
+            }
+        });
+    }
+
+    function msgElimnarActi(id) {
+        Messenger.options = {
+            extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+            theme: 'flat'
+        }
+        msg = Messenger().post({
+            message: 'are you sure?',
+            actions: {
+                delete: {
+                    label: "Delete",
+                    action: function () {
+                        msg.hide();
+                        eliminarActividad(id)
+                    }
+                },
+
+                cancel: {
+                    action: function () {
+                        msg.hide();
+                        return false;
+                    }
+                }
+            }
+        });
+    }
+
+
+    function eliminarActividad(id) {
+        var idA = id;
+        $.ajax({
+            url: "../Docente/eliminarActividad",
+            type: 'POST',
+            data: JSON.stringify({ _idActividad: idA }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (data) {
+                if (data == 0) {
+                    Messenger.options = {
+                        extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                        theme: 'flat'
+                    }
+                    Messenger().post({
+                        message: 'Activity successfully removed',
+                        type: 'success',
+                        hideAfter: 3,
+                        showCloseButton: false
+                    });
+                    location.reload();
+                }
+                else {
+                    Messenger.options = {
+                        extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                        theme: 'flat'
+                    }
+                    Messenger().post({
+                        message: 'This activity can not be deleted. Assigned or already resolved',
+                        type: 'error',
+                        hideAfter: 3,
+                        showCloseButton: false
+                    });
+                }
+            },
+            beforeSend: function () {
+                $("#modalGif").modal('show');
+            },
+            complete: function () {
+                $("#modalGif").modal('hide');
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+            }
+        });
+    }
+
+    function msgElimnarAsig(id) {
+        Messenger.options = {
+            extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+            theme: 'flat'
+        }
+        msg = Messenger().post({
+            message: 'are you sure?',
+            actions: {
+                delete: {
+                    label: "Delete",
+                    action: function () {
+                        msg.hide();
+                        eliminarAsignacion(id)
+                    }
+                },
+
+                cancel: {
+                    action: function () {
+                        msg.hide();
+                        return false;
+                    }
+                }
+            }
+        });
+    }
+
+    function eliminarAsignacion(id) {
+        $.ajax({
+            url: "../Docente/eliminarAsignacion",
+            data: { _idActiModu: id },
+            type: 'POST',
+            dataType: 'json',
+            success: function (json) {
+                if (json == 0) {
+                    var moduloDe = $("#asig" + id + " td:nth-child(1)").html();
+                    var moduToDel = moduloDe.substr(0, 4);
+                    $("#tBodyAsignar").find("#asig" + id).remove();
+                    if (moduloSelNow == moduToDel) {
+                        moduloSelNow = '';
+                    }
+                    Messenger.options = {
+                        extraClasses: 'messenger-fixed messenger-on-top messenger-on-right',
+                        theme: 'flat'
+                    }
+                    Messenger().post({
+                        message: 'Actvidad eliminada con exito',
+                        type: 'success',
+                        hideAfter: 3,
+                        showCloseButton: false
+                    });
+                    for (var i = 0; i < modulosYa.length; i++) {
+                        if (modulosYa[i] == moduToDel) {
+                            modulosYa.splice(i, 1);
+                        }
+                    }
+                    return false;
+                }
+
+                Messenger.options = {
+                    extraClasses: 'messenger-fixed messenger-on-top messenger-on-right',
+                    theme: 'flat'
+                }
+                Messenger().post({
+                    message: 'The assignment can not be deleted. Has already been resolved',
+                    type: 'error',
+                    hideAfter: 3,
+                    showCloseButton: false
+                });
+            },
+            beforeSend: function () {
+                $("#modalGif").modal('show');
+            },
+            complete: function () {
+                $("#modalGif").modal('hide');
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+            }
+        });
+    }
+
+</script>
+
+@Scripts.Render("~/Scripts/plugins/datatables/jquery.dataTables.min.js")
+@Scripts.Render("~/Scripts/plugins/datatables/jquery.dataTables.js")
+@Scripts.Render("~/Scripts/plugins/datatables/datatables-bs3.js")
+@Scripts.Render("~/Scripts/bootstrap-select.min.js")
+
+
+
+

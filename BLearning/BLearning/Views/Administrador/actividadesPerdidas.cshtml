@@ -1,0 +1,144 @@
+﻿@model List<BLearning.Models.Negocio.ActividadEntidad>
+           
+@{
+    Layout = "~/Views/Shared/_LayoutAdministrador.cshtml";
+}
+
+
+<div class="col-lg-12">
+    <div class="page-title">
+        <h1>
+            Students - Statistics
+        </h1>
+        <ol class="breadcrumb">
+            <li>
+                <i class="fa fa-bar-chart-o active"></i><a href="#" onclick="return false;"> Statistics</a>
+            </li>
+        </ol>
+
+    </div>
+</div>
+
+
+<div class="col-lg-12">
+    <div class="portlet portlet-default">
+        <div class="portlet-heading">
+            <div class="portlet-title">
+                <h4><i class="fa fa-exchange fa-fw"></i> Activities Losed</h4>
+            </div>
+            <div class="portlet-widgets">
+                <a data-toggle="collapse" data-parent="#accordion" href="#transactionsPortlet"><i class="fa fa-chevron-down"></i></a>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div id="transactionsPortlet" class="panel-collapse collapse in">
+            <div class="portlet-body">
+
+                <div class="table-responsive dashboard-demo-table">
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th># questions</th>
+                                <th>Duration</th>
+                                <th>Assign to</th>
+                                <th>Assign it</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr id="@item.idActividad">
+                                    <td id="">@item.descripcion</td>
+                                    <td id="cantLecc">@item.nPreguntas</td>
+                                    <td id="cantLecc">@item.duracion</td>
+                                    <td id="btns">
+                                        <select>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Guerrero Jean Fernando</option>
+                                            <option value="3134">Garcia Guerrero Jean Fernando</option>
+                                            <option value="3134">Garcia Guerrero Jean Fernando</option>
+                                            <option value="3134">Garcia Guerrero Jean Fernando</option>
+                                            <option value="3134">Garcia Guerrero Bryan Josue</option>
+                                            <option value="3134">Garcia Guerrero Bryan Josue</option>
+                                            <option value="3134">Garcia Guerrero Bryan Josue</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Guerrero Jean Fernando</option>
+                                            <option value="3134">Garcia Guerrero Jean Fernando</option>
+                                            <option value="3134">Garcia Guerrero Jean Fernando</option>
+                                            <option value="3134">Garcia Guerrero Jean Fernando</option>
+                                            <option value="3134">Garcia Guerrero Bryan Josue</option>
+                                            <option value="3134">Garcia Guerrero Bryan Josue</option>
+                                            <option value="3134">Garcia Guerrero Bryan Josue</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Guerrero Jean Fernando</option>
+                                            <option value="3134">Garcia Guerrero Jean Fernando</option>
+                                            <option value="3134">Garcia Guerrero Jean Fernando</option>
+                                            <option value="3134">Garcia Guerrero Jean Fernando</option>
+                                            <option value="3134">Garcia Guerrero Bryan Josue</option>
+                                            <option value="3134">Garcia Guerrero Bryan Josue</option>
+                                            <option value="3134">Garcia Guerrero Bryan Josue</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Cuadros Guerrero Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Alcivar Bryan Fernando</option>
+                                            <option value="3134">Garcia Guerrero Jean Fernando</option>
+                                            <option value="3134">Garcia Guerrero Jean Fernando</option>
+                                            <option value="3134">Garcia Guerrero Jean Fernando</option>
+                                            <option value="3134">Garcia Guerrero Jean Fernando</option>
+                                            <option value="3134">Garcia Guerrero Bryan Josue</option>
+                                            <option value="3134">Garcia Guerrero Bryan Josue</option>
+                                            <option value="3134">Garcia Guerrero Bryan Josue</option>
+                                        </select>
+                                    </td>
+                                    <td id="btns">
+                                        <a id="btn-edit" class="btn btn-xs btn-blue" onclick="editarNumLeccion(@item.idNivel)"><i class="fa fa-edit"></i> Assign</a>
+                                    </td>
+                                </tr>
+
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

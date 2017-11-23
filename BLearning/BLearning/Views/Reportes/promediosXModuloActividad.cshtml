@@ -1,0 +1,454 @@
+﻿@using BLearning.Models.Negocio
+@{
+    ViewBag.Title = "Report Activity";
+    Layout = "~/Views/Shared/_LayoutDocente.cshtml";
+    List<EstudiantePromedioEntidad> listaCalifi = (List<EstudiantePromedioEntidad>)ViewBag.PromediosActividad;
+    List<EstudiantePromedioEntidad> listaEfect = (List<EstudiantePromedioEntidad>)ViewBag.EfectividadActividad;
+    int exele = 0;
+    int mBueno = 0;
+    int bueno = 0;
+    int regular = 0;
+    int malo = 0;
+    decimal? listen = 0, read = 0, grammar = 0;
+    <script>
+        var arrayCantiEstu = [];
+    </script>
+    foreach (var item in listaCalifi)
+    {
+        if (item.promedio >= 95)
+        {
+            <script>
+                var objEstuCali = { "label": "Excellent", "nombre": '@item.nombres', "promedio": '@item.promedio' };
+                arrayCantiEstu.push(objEstuCali);
+            </script>
+        }
+        if (item.promedio >= 85 && item.promedio < 95)
+        {
+            <script>
+                var objEstuCali = { "label": "Very Good", "nombre": '@item.nombres', "promedio": '@item.promedio' };
+                arrayCantiEstu.push(objEstuCali);
+            </script>
+        }
+        if (item.promedio >= 70 && item.promedio < 85)
+        {
+            <script>
+                var objEstuCali = { "label": "Good", "nombre": '@item.nombres', "promedio": '@item.promedio' };
+                arrayCantiEstu.push(objEstuCali);
+            </script>
+        }
+        if (item.promedio >= 40 && item.promedio < 70)
+        {
+            <script>
+                var objEstuCali = { "label": "Regular", "nombre": '@item.nombres', "promedio": '@item.promedio' };
+                arrayCantiEstu.push(objEstuCali);
+            </script>
+}
+        else
+        {
+            <script>
+                var objEstuCali = { "label": "Deficient", "nombre": '@item.nombres', "promedio": '@item.promedio' };
+                arrayCantiEstu.push(objEstuCali);
+            </script>
+        }
+    }
+}
+
+@Styles.Render("~/Content/plugins/morris/morris.css")
+
+<div class="col-lg-12">
+    <div class=" row">
+        <div class="col-lg-12">
+
+            <div class="page-title">
+                <h1>
+                    Activity:
+                    <small>@ViewBag.TituloAct</small>
+                </h1>
+                <ol class="breadcrumb">
+                    <li>
+                        <i class="fa fa-bar-chart-o"></i><a href="#" onclick="history.back();"> Activities</a>
+                    </li>
+                    <li class="active">Reports</li>
+                    <li class="pull-right">
+                        <a href="#" onclick="history.back();" class="btn btn-red btn-square date-picker"><i class="fa fa-chevron-circle-left"><span> Back</span></i></a>
+                    </li>
+                </ol>
+
+            </div>
+        </div>
+    </div>
+
+    <div class=" row">
+        <div class="col-lg-6">
+            <div class="portlet portlet-default">
+                <div class="portlet-heading">
+                    <div class="portlet-title">
+                        <h4>Lists of students</h4>
+                    </div>
+                    <div class="portlet-widgets">
+                        <span class="divider"></span>
+                        <a data-toggle="collapse" data-parent="#accordion" href="#lineChart"><i class="fa fa-chevron-down"></i></a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="panel-collapse collapse in">
+                    <div class="portlet-body">
+                        <div class=" row">
+                            <div class="col-lg-12">
+                                @if (listaCalifi.Count == 0)
+                                {
+                                    <div class="col-lg-12">
+                                        <br />
+                                        <br />
+                                        <p class="text-center text-muted">No data</p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="table-responsive">
+                                        <table id="tablaPormedios" class="table table-bordered table-condensed">
+                                            <thead>
+                                                <tr>
+                                                    <th> #</th>
+                                                    <th>Names</th>
+                                                    <th>Score</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                @{ var num = 0;}
+                                                @foreach (var item in listaCalifi)
+                                                {
+                                                    num= num+1;
+                                                    if (item.promedio >= 95)
+                                                    {
+                                                        exele++;
+
+                                                    }
+                                                    if (item.promedio >= 85 && item.promedio < 95)
+                                                    {
+                                                        mBueno++;
+                                                    }
+                                                    if (item.promedio >= 70 && item.promedio < 85)
+                                                    {
+                                                        bueno++;
+                                                    }
+                                                    if (item.promedio >= 40 && item.promedio < 70)
+                                                    {
+                                                        regular++;
+                                                    }
+                                                    else 
+                                                    {
+                                                        malo++;
+                                                    }
+                                                    <tr>
+                                                        <td>@num</td>
+                                                        <td>@item.nombres</td>
+                                                        <td style="text-align: right">@item.promedio</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="portlet portlet-default">
+                <div class="portlet-heading">
+                    <div class="portlet-title">
+                        <h4>Effectiveness by Skills</h4>
+                    </div>
+                    <div class="portlet-widgets">
+                        <span class="divider"></span>
+                        <a data-toggle="collapse" data-parent="#accordion" href="#lineChart"><i class="fa fa-chevron-down"></i></a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="panel-collapse collapse in">
+                    <div class="portlet-body">
+                        <div class=" row">
+                            <div class="col-lg-12">
+                                @if (listaEfect.Count == 0)
+                                {
+                                    <div class="col-lg-12">
+                                        <br />
+                                        <br />
+                                        <p class="text-center text-muted">No data</p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="table-responsive">
+                                        <table id="tablaPormedios" class="table table-bordered table-condensed">
+                                            <thead>
+                                                <tr>
+                                                    <th>Names</th>
+                                                    <th>Listening</th>
+                                                    <th>Reading</th>
+                                                    <th>Grammar/Vocabulary</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in listaEfect)
+                                                {
+                                                    <tr>
+                                                        <td>@item.nombres</td>
+                                                        @if (!item.listening.HasValue)
+                                                        {
+                                                            <td style="text-align: right">N/A</td>
+                                                            listen = -1;
+                                                        }
+                                                        else
+                                                        {
+                                                            listen = listen + item.listening;
+                                                            <td style="text-align: right">@item.listening%</td>
+                                                        }
+                                                        @if (!item.reading.HasValue)
+                                                        {
+                                                            <td style="text-align: right">N/A</td>
+                                                            read = -1;
+                                                        }
+                                                        else
+                                                        {
+                                                            read = read + item.reading;
+                                                            <td style="text-align: right">@item.reading%</td>
+                                                        }
+                                                        @if (!item.gramar.HasValue)
+                                                        {
+                                                            <td style="text-align: right">N/A</td>
+                                                            grammar = -1;
+                                                        }
+                                                        else
+                                                        {
+                                                            grammar = grammar + item.gramar;
+                                                            <td style="text-align: right">@item.gramar%</td>
+                                                        }
+                                                    </tr>
+                                                }
+                                                @{
+                                                    if(listen == -1)
+                                                    { listen = null;  }
+                                                    else
+                                                    { listen = listen / listaEfect.Count; }
+                                                    if (read == -1)
+                                                    { read = null; }
+                                                    else { read = read / listaEfect.Count;  }
+                                                    if (grammar == -1)
+                                                    { grammar = null; }
+                                                    else { grammar = grammar / listaEfect.Count; }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="portlet portlet-default">
+                <div class="portlet-heading">
+                    <div class="portlet-title">
+                        <h4>Quality</h4>
+                    </div>
+                    <div class="portlet-widgets">
+                        <span class="divider"></span>
+                        <a data-toggle="collapse" data-parent="#accordion" href="#lineChart"><i class="fa fa-chevron-down"></i></a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="panel-collapse collapse in">
+                    <div class="portlet-body">
+                        <div class="row" id="rowPastel">
+                            <div class=" col-md-8">
+                                <div class="portlet-body">
+                                    <div id="morris-chart-donut"></div>
+                                </div>
+                            </div>
+                            <div id="EtiquetasPastel" class=" col-md-4" style="display:none">
+                                <br />
+                                <br />
+                                <br />
+                                <ul>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #92d050'></span>&nbsp
+                                        <a id="Excellent" href="#" onclick="modalCali(this); return false;">Excellent</a>
+                                    </li>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #46b8e9;'></span>&nbsp
+                                        <a id="Verygood" href="#" onclick="modalCali(this); return false;">Very good</a>
+                                    </li>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #ffff00;'></span>&nbsp
+                                        <a id="Good" href="#" onclick="modalCali(this); return false;">Good</a>
+                                    </li>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #f79646'></span>&nbsp
+                                        <a id="Regular" href="#" onclick="modalCali(this); return false;">Regular</a>
+                                    </li>
+                                    <li>
+                                        <span class='fa fa-square-o' style='background-color: #ff0000'></span>&nbsp
+                                        <a id="Deficient" href="#" onclick="modalCali(this); return false;">Deficient</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="portlet portlet-default">
+                <div class="portlet-heading">
+                    <div class="portlet-title">
+                        <h4>Percentage by Skills</h4>
+                    </div>
+                    <div class="portlet-widgets">
+                        <span class="divider"></span>
+                        <a data-toggle="collapse" data-parent="#accordion" href="#lineChart"><i class="fa fa-chevron-down"></i></a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="panel-collapse collapse in">
+                    <div class="portlet-body">
+                        <div class=" row" id="rowBarras">
+                            <div class="col-lg-12">
+                                <div class="portlet-body">
+                                    <div id="morris-chart-barrasDes"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   
+</div>
+
+<div class="modal fade" id="modalAsignar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width:60%" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-darrk-blue-o">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">List of students</h4>
+            </div>
+            <div class="modal-body">
+                <div class=" row">
+                    <div class=" col-lg-12">
+                        <div class="table-responsive">
+                            <table id="tablaDependencia" class="table table-striped table-bordered table-hover table-green">
+                                <thead>
+                                    <tr role="row">
+                                        <th>Names</th>
+                                        <th>Scores</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tBodyCalificaciones"></tbody>
+                            </table>
+
+                            <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content ui-corner-all" id="ui-id-1" tabindex="0" style="display: none; min-width: 98px; z-index: 100001; width: 112px; top: 188px; left: 300px;">
+                                <li class="ui-menu-item" role="presentation">
+                                    <a id="ui-id-2" class="ui-corner-all" tabindex="-1">red</a>
+                                </li>
+                                <li class="ui-menu-item" role="presentation">
+                                    <a id="ui-id-3" class="ui-corner-all" tabindex="-1">blue</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Scripts.Render("~/Scripts/plugins/morris/raphael-2.1.0.min.js")
+@Scripts.Render("~/Scripts/plugins/morris/morris.js")
+
+<script>
+    $(document).ready(function () {
+        if ('@listaCalifi.Count' == 0) {
+            $("#rowPastel").html('<div class="col-lg-12"<br /><br /><p class="text-center text-muted">No data</p></div>');
+        }
+        else {
+            pastel();
+        }
+        if ('@listaEfect.Count' == 0) {
+            $("#rowBarras").html('<div class="col-lg-12"<br /><br /><p class="text-center text-muted">No data</p></div>');
+        }
+        else {
+            barras();
+        }
+    });
+    function pastel() {
+        var arrayPosiciones = [];
+        arrayPosiciones[0] = { "label": "Excellent", "value": '@exele' };
+        arrayPosiciones[1] = { "label": "Very good", "value": '@mBueno' };
+        arrayPosiciones[2] = { "label": "Good", "value": '@bueno' };
+        arrayPosiciones[3] = { "label": "Regular", "value": '@regular' };
+        arrayPosiciones[4] = { "label": "Deficient", "value": '@malo' };
+        $("#morris-chart-donut").html("");
+        var morris = Morris.Donut({
+            element: 'morris-chart-donut',
+            data: arrayPosiciones,
+            resize: true,
+            colors: ["#92d050", "#46b8e9", "#ffff00", "#f79646", "#ff0000"],
+        })
+        $("#EtiquetasPastel").show();
+        $("#EtiquetasPastel").find("#Excellent").html("Excellent: " + '@exele');
+        $("#EtiquetasPastel").find("#Verygood").html("Very good: " + '@mBueno');
+        $("#EtiquetasPastel").find("#Good").html("Good: " + '@bueno');
+        $("#EtiquetasPastel").find("#Regular").html("Regular: " + '@regular');
+        $("#EtiquetasPastel").find("#Deficient").html("Deficient: " + '@malo');
+    }
+
+    function barras() {
+        var arrayDes = [];
+        //arrayDes[0] = { y: "Listening", a: '@listen' };
+
+        var c = 0;
+        if ('@listen' != '') {
+            arrayDes[c] = { y: "Listening", a: '@listen' };
+            c++;
+        }
+        if ('@read' != '') {
+            arrayDes[c] = { y: "Reading", a: '@read' };
+            c++;
+        }
+        if ('@grammar' != '') {
+            arrayDes[c] = { y: "Grammar/Vocabulary", a: '@grammar' };
+            c++;
+        }
+        console.log(arrayDes);
+        Morris.Bar({
+            element: 'morris-chart-barrasDes',
+            data: arrayDes,
+            xkey: 'y',
+            ykeys: 'a',
+            labels: 'Percent',
+            barColors: ["#3ee9d1"],
+        });
+    }
+    function modalCali(me) {
+        var posicion = me.id;
+        $("#tBodyCalificaciones").html("");
+        for (var i = 0; i < arrayCantiEstu.length; i++) {
+            if (posicion == arrayCantiEstu[i].label) {
+                $("#tBodyCalificaciones").append('<tr><td>' + arrayCantiEstu[i].nombre + '</td><td>' + arrayCantiEstu[i].promedio + '</td></tr>');
+            }
+        }
+        $("#modalAsignar").modal("show");
+    }
+</script>

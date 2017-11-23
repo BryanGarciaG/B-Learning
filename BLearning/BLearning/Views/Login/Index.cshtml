@@ -1,0 +1,86 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+@Styles.Render("~/Content/plugins/messenger/messenger.css")
+@Styles.Render("~/Content/plugins/messenger/messenger-theme-flat.css")
+<body class="login">
+    <div class="container">
+        <div class=" row">
+            <div class="col-lg-12">
+                <div class="col-md-4 col-md-offset-4">
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <div class="portlet portlet-default">
+                       
+                        <div class="portlet-body">
+                            <br />
+                            <img class="img-responsive" src="./img/inicio-bl.png" alt="">
+                            <br />
+                            <br />
+                            <form accept-charset="UTF-8" role="form">
+                                <fieldset>
+                                    <div class="form-group">
+                                        <input class="form-control" placeholder="Usuario" id="usuario" name="usuario" type="text" required />
+                                    </div>
+                                    <div class="form-group">
+                                        <input class="form-control" placeholder="Contraseña" id="contra" name="contra" type="password" required />
+                                    </div>
+                                    <div class="form-group">
+                                        @Html.DropDownList("tipoUsu", ViewData["tiposUser"] as SelectList, "Seleccione tipo de usuario...", new { @class = "form-control",@id = "tipoU"})
+                                    </div>
+                                    <br>
+                                    <button type="button" onclick="login();" class="btn btn-lg btn-dark-blue btn-block">Log in</button>
+                                </fieldset>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</body>
+@Scripts.Render("~/Scripts/jquery.js")
+@Scripts.Render("~/Scripts/plugins/messenger/messenger.min.js")
+@Scripts.Render("~/Scripts/plugins/messenger/messenger-theme-flat.js")
+
+
+<script>
+    function login()
+    {
+        var us = $("#usuario").val();
+        var pass = $("#contra").val();
+        var tU = $("#tipoU").val();
+        $.ajax({
+            url: "./Login/valiLogin",
+            data: { usuario: us,contra: pass,tipoUsu:tU},
+            type: 'POST',
+            dataType: 'json',
+            success: function (json) {
+                if (json == "Teacher") {
+                    location.href = "@Url.Action("Inicio", "Docente", new { @area=""})";
+                }
+                if (json == "Administrator") {
+                    location.href = "@Url.Action("Inicio", "Administrador", new { @area=""})";
+                }
+                if (json =="ERROR") {
+                    Messenger.options = {
+                        extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+                        theme: 'flat'
+                    }
+                    Messenger().post({
+                        message: 'Error: Verify your credentials',
+                        type: 'error',
+                        hideAfter: 3,
+                        showCloseButton: false
+                    });
+                }
+            }
+        });
+    }
+</script>

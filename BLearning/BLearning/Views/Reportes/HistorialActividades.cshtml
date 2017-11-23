@@ -1,0 +1,175 @@
+﻿@using System.Collections.Generic;
+@using BLearning.Models.Negocio;
+@model List<BLearning.Models.Negocio.DocenteActividadesEntidad>
+@{
+    ViewBag.Title = "Historial-Actividades";
+    Layout = "~/Views/Shared/_LayoutAdministrador.cshtml";
+    List<ActividadesXDocenteEntidad> _objListaActividadesXdocente = (List<ActividadesXDocenteEntidad>)ViewData["CollectionActivities"];
+}
+
+<div class="row">
+    <div class="col-lg-12">
+
+        <div class="page-title">
+            <h1>
+                Teacher - History of activities
+            </h1>
+            <ol class="breadcrumb">
+                <li class="active"><i class="fa fa-bar-chart-o"></i> Reports</li>
+            </ol>
+        </div>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+
+<div class="col-lg-12">
+    <div class=" row">
+        <div class="col-sm-offset-9 col-sm-3">
+            <button id="botonPDF" onclick="imprimir(); return false;" class=" btn btn-red form-control">Export to PDF</button>
+        </div>
+    </div>
+    <br />
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+
+        <div class="portlet portlet-default">
+            <div class="portlet-heading">
+                <div class="portlet-title">
+                    <h4>Report of activities created in the last cycle</h4>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="portlet-body">
+                <div class="panel-group" id="accordion">
+                    @{ var i = 0;}
+                    @foreach (var item in Model)
+                    {
+                        i++;
+                    <div class="panel panel-default" id="docente-@i">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                @item.nombres <strong>(@item.nActivCreadas ACTIVITIES)</strong>
+                            </h4>
+                        </div>
+                        <div>
+
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="tablaActividades-@i" class="table table-bordered table-hover table-condensed">
+                            <thead id="tHeadtablaActividades-@i">
+                                <tr>
+                                    <th>Level</th>
+                                    <th>Description</th>
+                                    <th>Skills</th>
+                                    <th>Questions</th>
+                                    <th>Duration</th>
+                                    <th>Created date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tBodyTablaActividades-@i">
+                                @foreach (var actividades in _objListaActividadesXdocente.Where(C => C.idDocente == item.idPersona))
+                                    {
+                                    <tr>
+                                        <td>@actividades.idNivel</td>
+                                        <td>@actividades.descripcion</td>
+                                        <td>@actividades.Destrezas</td>
+                                        <td>@actividades.nPreguntas</td>
+                                        <td>@actividades.duracion min</td>
+                                        <td>@actividades.fechaCreacion.ToShortDateString()</td>
+                                        <td><a class="btn btn-orange btn-xs" href="../Reportes/verActividad?idA=@actividades.idActividad">View</a></td>
+                                    </tr>
+                                    }
+                            </tbody>
+                        </table>
+                    </div>
+                    }
+                </div>
+
+            </div>
+            <!-- /.portlet-body -->
+        </div>
+        <!-- /.portlet -->
+
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+
+<div style="display:none" class="container" id="page2PDF">
+    <!--Cabecera del pdf Imagenes-->
+    <table style="text-align:center" width="100%">
+        <tr>
+            <td><img height="100px" width="200px" src="../Img/espamLogo.png" /></td>
+            <td><img height="100px" width="200px" src="../Img/logoCI.jpg" /></td>
+        </tr>
+    </table>
+    <br />
+    <!--titulo del pdf-->
+    <table style="text-align:center" width="100%">
+        <tr>
+            <td><h2>Report of activities created in the last cycle (C@(ViewData["CicloActual"]))</h2></td>
+        </tr>
+    </table>
+
+   
+    
+    <!--contenido-->
+    @{ var j = 0;}
+    @foreach (var item in Model)
+{
+    j++;
+    <table border="1" width="100%">
+        <thead>
+            <tr>
+                <th style="text-align:center" colspan="6">@item.nombres (@item.nActivCreadas ACTIVITIES)</th>
+            </tr>
+            <tr>
+                <th style="padding: 5px" width="30%">Topic</th>
+                <th style="padding: 5px" width="10%">Level</th>
+                <th style="padding: 5px" width="30%">Skills</th>
+                <th style="padding: 5px" width="10%">Duration</th>
+                <th style="padding: 5px" width="10%">Questions</th>
+                <th style="padding: 5px" width="10%">Created</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var actividades in _objListaActividadesXdocente.Where(C => C.idDocente == item.idPersona))
+            {
+                <tr>
+                    <td style="padding: 5px">@actividades.descripcion</td>
+                    <td style="padding: 5px">@actividades.idNivel</td>
+                    <td style="padding: 5px">@actividades.Destrezas</td>
+                    <td style="padding: 5px">@actividades.duracion</td>
+                    <td style="padding: 5px">@actividades.nPreguntas</td>
+                    <td style="padding: 5px">@actividades.fechaCreacion.ToString("d")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+            <br />
+}
+
+</div>
+
+
+<script>
+    function imprimir() {
+        $('#page2PDF').css("display", "block");
+        var str = $('#page2PDF').html();
+        $('#page2PDF').css("display", "none");
+        // str = str + "" + $('#post').html();
+        //var win = window.open("", "");
+        var win = window;
+        win.document.close();
+        var antes = win.document.body.innerHTML;
+        win.document.body.innerHTML = str;
+        win.print(); // blocking - so close will not 
+        win.document.body.innerHTML = antes;
+        // win.close(); // execute until this is done
+
+    };
+</script>

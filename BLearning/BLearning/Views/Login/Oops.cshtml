@@ -1,0 +1,58 @@
+﻿@{
+    Layout = null;
+    ViewBag.Title = "Oops";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oops</title>
+
+    <!-- GLOBAL STYLES - Include these on every page. -->
+    <!--SweetAlert-->
+    <link rel="stylesheet" type="text/css" href="http://tristanedwards.me/u/SweetAlert//lib/sweet-alert.css">
+    <script src="http://tristanedwards.me/u/SweetAlert//lib/sweet-alert.js"></script>
+
+    @Scripts.Render("~/Scripts/jquery.js")
+    @Scripts.Render("~/Scripts/jquery-ui.min.js")
+
+</head>
+
+<body>
+    <div id="wrapper">
+
+    </div>
+</body>
+</html>
+<script>
+    $(document).ready(errorAlert());
+    function errorAlert() {
+        var opcion = '@ViewData["nota"]';
+        console.log(opcion);
+        if ('@ViewData["nota"]' == "docenteAdministrador") {
+            swal({
+                title: "Oops!",
+                text: "Your session has expired.",
+                type: "error",
+                confirmButtonText: "OK",
+            },
+           function () {
+               window.location.href = '@Url.Action("Index", "Login", new { @area = "" })';
+           });
+        }else
+        {
+            swal({
+                title: "Oops!",
+                text: '@ViewData["nota"]',
+                type: "error",
+                confirmButtonText: "OK",
+            },
+           function () {
+               window.location.href = 'http://gestionacademica.espam.edu.ec/';
+           });
+    }
+
+    }
+</script>

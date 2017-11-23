@@ -1,0 +1,247 @@
+﻿@model BLearning.Models.Negocio.ReporteEstudianteEntidad
+@{
+    ViewBag.Title = "Statistics";
+    Layout = " ~/Views/Shared/_Layout.cshtml";
+}
+
+@Styles.Render("~/Content/plugins/morris/morris.css")
+<div class="row">
+    <div class="col-lg-12">
+
+        <div class="page-title">
+            <h1>
+                Statistics
+                <small>Progress in the course</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li>
+                    <i class="fa fa-dashboard"></i><a href="@Url.Action("Lecciones", "Estudiante", new { @area=""})"> Lessons</a>
+                </li>
+                <li class="active">Statistics</li>
+                <li class="pull-right">
+                    <a onclick="history.back();" class="btn btn-red btn-square date-picker"><i class="fa fa-chevron-circle-left"><span> Back</span></i></a>
+                </li>
+            </ol>
+
+        </div>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- PAGE LEVEL PLUGIN STYLES -->
+<div class="row">
+    <!-- Line Chart Example -->
+    <div class="col-lg-12">
+        <div class="portlet portlet-dark-blue">
+            <div class="portlet-heading">
+                <div class="portlet-title">
+                    <h4>Learning curve</h4>
+                </div>
+                <div class="portlet-widgets">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#lineChart"><i class="fa fa-chevron-down"></i></a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div id="lineChart" class="panel-collapse collapse in">
+                <div class="portlet-body">
+                    <div id="chart-line"></div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <div class="col-sm-12">
+        <div class="portlet portlet-dark-blue">
+            <div class="portlet-heading">
+                <div class="portlet-title">
+                    <h4>Percentage of lessons completed</h4>
+                </div>
+                <div class="portlet-widgets">
+                    
+                    <a data-toggle="collapse" data-parent="#accordion" href="#barChart1"><i class="fa fa-chevron-down"></i></a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div id="barChart1" class="panel-collapse collapse in">
+                <div class="portlet-body" style="text-align: center;">
+                    <div class="row">
+                        <div class="col-md-6 practica" >
+                            <div id="chart-bar2" style="position: relative;">
+                            </div>
+                        </div>
+                        <div class="col-md-6 evaluativa">
+                            <div id="chart-bar3" style="position: relative;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <div class="col-lg-6 col-sm-6">
+        <div class="portlet portlet-dark-blue">
+            <div class="portlet-heading">
+                <div class="portlet-title ">
+                    <h4><i class="fa fa-certificate text-yellow fa-lg"></i> Progress</h4>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="portlet-body" style="overflow: hidden; width: auto;">
+
+                <div class="row">
+                    @{var calificacion = (decimal)ViewData["puntos"];}
+                        <div class="col-xs-12 text-center">
+                            <img class="img-responsive" id="img-cali-star" style="height: 200px; margin:auto" src="" alt="Alternate Text" />
+                        </div>
+                        <div class="col-xs-12">
+                            <div style="text-align:center">
+                                <h3 id="mens1"></h3>
+                                <h4 id="mens2"></h4>
+                            </div>
+                            <div class="caja-puntos">
+                                <div class="texto">
+                                    <div class="box-numero text-center">
+                                        <span id="calif" data-valor="@calificacion">@calificacion</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+   
+    <!-- /.col-lg-12 -->
+
+    <div class="col-sm-6">
+        <div class="portlet portlet-dark-blue">
+            <div class="portlet-heading">
+                <div class="portlet-title">
+                    <h4>Percent Effectiveness</h4>
+                </div>
+                <div class="portlet-widgets">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#barChart"><i class="fa fa-chevron-down"></i></a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div id="barChart" class="panel-collapse collapse in">
+                <div class="portlet-body efect" style="text-align: center;">
+                    <div id="chart-bar" style="position: relative;">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+</div>
+
+@Scripts.Render("~/Scripts/plugins/morris/raphael-2.1.0.min.js")
+@Scripts.Render("~/Scripts/plugins/morris/morris.js")
+@Scripts.Render("~/Scripts/estado-calificacion.js")
+
+<script>
+    var datos =  @Html.Raw(Json.Encode(Model))
+
+    jQuery(document).ready(function () {
+        var MorrisBar = Morris.Line({
+            element: 'chart-line',
+            data: datos.calificacionesEstudiante,
+            parseTime: false,
+            xkey: 'numLeccion',
+            ykeys: ['valor'],
+            lineColors: ['rgb(243, 156, 18)'],
+            //axes: false,
+            //grid: false,
+            xLabelFormat: function (d) {
+                return d.src.numLeccion;
+            },
+            labels: ['Score'],
+            pointSize: 5,
+            hideHover: 'auto',
+            resize: true,
+            etiquetas: ['calificacion'],
+            hoverCallback: function (index, options, content) {
+                return content;
+            },
+        });
+        if (datos.efectividadDeRespuestas.length != 0)
+        {
+            var MorrisBar = Morris.Bar({
+                element: 'chart-bar',
+                data: datos.efectividadDeRespuestas,
+                xkey: 'tipoEfectividad',
+                ykeys: ['porcentaje'],
+                labels: ['Percent'],
+                postUnits: '%',
+                hideHover: 'auto',
+                goals: [100],
+                resize: true,
+                xLabelFormat: function (d) {
+                    return d.src.tipoEfectividad;
+                },
+                barColors: ["#3ee9d1"],
+                hoverCallback: function (index, options, content, row) {
+                    return content;
+                }
+            });
+        } else { $(".efect").append("<br/><label> You don't have any percent effectiveness</label>"); }
+       
+        if (datos.leccionesPracticasCompletadas.length != 0)
+        {
+            $(".practica").append("<label>Practical Lessons</label>");
+            var MorrisBar = Morris.Bar({
+                element: 'chart-bar2',
+                data: datos.leccionesPracticasCompletadas,
+                xkey: 'numLeccion',
+                ykeys: ['valor'],
+                postUnits: '%',
+                labels: ['Percent'],
+                hideHover: 'auto',
+                goals: [100],
+                grid: false,
+                resize: true,
+                barColors: ["#2fcbb5"],
+                xLabelFormat: function (d) {
+                    return d.src.numLeccion;
+                },
+                hoverCallback: function (index, options, content) {
+                    return content;
+                }
+            });
+        } else { $(".practica").append("<br/><label>There are no practical lessons</label>"); }
+       
+        if (datos.leccionesEvaluativasCompletadas.length != 0)
+        {
+            $(".evaluativa").append("<label>Evaluative Lessons</label>");
+            var MorrisBar = Morris.Bar({
+                element: 'chart-bar3',
+                data: datos.leccionesEvaluativasCompletadas,
+                xkey: 'numLeccion',
+                ykeys: ['valor'],
+                postUnits: '%',
+                labels: ['Percent'],
+                hideHover: 'auto',
+                goals: [100],
+                grid: false,
+                resize: true,
+                barColors: ["#46b8e9"],
+                xLabelFormat: function (d) {
+                    return d.src.numLeccion;
+                },
+                hoverCallback: function (index, options, content) {
+                    return content;
+                }
+            });
+        } else { $(".evaluativa").append("<br/><label>There are no evaluative lessons</label>"); }
+        
+       
+    })
+
+    agregarMensaje();
+
+</script>
+
+  

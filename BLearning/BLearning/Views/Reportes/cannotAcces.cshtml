@@ -1,0 +1,40 @@
+﻿@using BLearning.Models.Negocio;
+@{
+    PersonaEntidad objPersona = Session["personaLogin"] as PersonaEntidad;
+    if (objPersona.Nivel.ToString() == "Docente")
+    {
+        Layout = "~/Views/Shared/_LayoutDocente.cshtml";
+    }
+    if (objPersona.Nivel.ToString() == "Administradores")
+    {
+        Layout = "~/Views/Shared/_LayoutAdministrador.cshtml";
+    }
+    if (objPersona.Nivel.ToString() == "Alumno")
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    
+}
+
+
+
+
+<br />
+<br />
+<br />
+<br />
+<br />
+<div class="row">
+    <div class="col-lg-6 col-lg-offset-3">
+        <h1 class="error-title">404</h1>
+        <h4 class="error-msg"><i class="fa fa-warning text-red"></i> Page Not Found</h4>
+        <p class="lead">The page you've requested could not be found on the server. Please contact your webmaster, or use the back button in your browser to navigate back to your most recent active page.</p>
+
+        <ul class="list-inline">
+            <li>
+                <a class="btn btn-red" href="#" onclick="history.back();">Back to...</a>
+            </li>
+        </ul>
+    </div>
+    <!-- /.col-lg-6 -->
+</div>

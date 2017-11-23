@@ -1,0 +1,200 @@
+﻿@{
+    ViewBag.Title = "Credits";
+    
+    var currentContro = ViewBag.Contro;
+    if (currentContro == "Docente")
+    {
+        Layout = "~/Views/Shared/_LayoutDocente.cshtml";
+    }
+    if (currentContro == "Administrador")
+    {
+        Layout = "~/Views/Shared/_LayoutAdministrador.cshtml";
+    }
+    if (currentContro == "Estudiante")
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+}
+
+
+<div class="row">
+
+
+    <div class="col-md-12">
+        <div class=" row">
+            <div class="col-lg-12">
+                <div class="page-title">
+                    <h1>
+                        System Credits
+
+                    </h1>
+                    <ol class="breadcrumb">
+                        <li>
+                            <i class="fa fa-home"></i>  <a href="../@currentContro/Index"> Home</a>
+                        </li>
+                        <li class="pull-right">
+                            <div id="reportrange" class="btn btn-green btn-square date-picker">
+                                <span>Versión 1.0.0</span>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="portlet portlet-default">
+                    <div class="portlet-heading">
+                        <div class="portlet-title">
+                            <h4>Design and development</h4>
+                        </div>
+                        <div class="portlet-widgets">
+                            <span class="divider"></span>
+                            <a data-toggle="collapse" data-parent="#accordion" href="#chat"><i class="fa fa-chevron-down"></i></a>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div id="chat" class="panel-collapse collapse in">
+                        <div class="slimScrollDiv" style="position: relative; overflow: hidden; width: auto;">
+                            <div class="portlet-body chat-widget" style="overflow: hidden; width: auto;">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="media">
+                                            <a class="pull-left" onclick="return false;" href="#">
+                                                <img style="width:60px;height:60px" class="media-object img-circle" src="../img/nathy.jpg" alt="">
+                                            </a>
+                                            <div class="media-body">
+                                                <h4 class="media-heading">
+                                                    <strong>Nathaly Alava Cagua</strong>
+                                                </h4>
+                                                <p>Computer Science Student</p>
+                                                <p>"Face your fears and you can be great" - Nathaly Alava</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="media">
+                                            <a class="pull-left" onclick="return false;" href="#">
+                                                <img style="width:60px;height:60px" class="media-object img-circle" src="../img/bryan.jpg" alt="">
+                                            </a>
+                                            <div class="media-body">
+                                                <h4 class="media-heading">
+                                                    <strong>Bryan García Guerrero</strong>
+                                                </h4>
+                                                <p>Computer Science Student</p>
+                                                <p>"El hombre no ha confundido el dinero con la felicidad. Lo ha confundido con la inmortalidad" - Bryan García Guerrero</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="portlet portlet-green">
+                    <div class="portlet-heading">
+                        <div class="portlet-title">
+                            <h4>Special thanks</h4>
+                        </div>
+                        <div class="portlet-widgets">
+                            <span class="divider"></span>
+                            <a data-toggle="collapse" data-parent="#accordion" href="#agradecimiento" aria-expanded="true"><i class="fa fa-chevron-down"></i></a>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div id="agradecimiento" class="panel-collapse collapse in" aria-expanded="true" style="">
+                        <div class="slimScrollDiv" style="position: relative; overflow: hidden; width: auto;">
+                            <div class="portlet-body" style="overflow: hidden; width: auto;">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="media">
+                                            <a class="pull-left" onclick="return false;" href="#">
+                                                <img style="width:60px;height:60px" class="media-object img-circle" src="../img/Ortega.jpg" alt="">
+                                            </a>
+                                            <div class="media-body">
+                                                <h4 class="media-heading">
+                                                    <strong>Luis Ortega Arcia</strong>
+                                                </h4>
+                                                <p>Tutor of the development and design team</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="media">
+                                            <a class="pull-left" onclick="return false;" href="#">
+                                                <img style="width:60px;height:60px" class="media-object img-circle" src="../img/guillermo.jpg" alt="">
+                                            </a>
+                                            <div class="media-body">
+                                                <h4 class="media-heading">
+                                                    <strong>Guillermo Intriago</strong>
+                                                </h4>
+                                                <p>Director of the CI</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="media">
+                                            <a class="pull-left" onclick="return false;" href="#">
+                                                <img class="media-object img-circle" src="../img/unknow-user.jpg" alt="">
+                                            </a>
+                                            <div class="media-body">
+                                                <h4 class="media-heading">
+                                                    <strong>Hector Zambrano</strong>
+                                                </h4>
+                                                <p>Teacher of the CI</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="media">
+                                            <a class="pull-left" onclick="return false;" href="#">
+                                                <img class="media-object img-circle" src="../img/marcos.jpg" alt="">
+                                            </a>
+                                            <div class="media-body">
+                                                <h4 class="media-heading">
+                                                    <strong>Marcos Anzules Reyna</strong>
+                                                </h4>
+                                                <p>Computer Engineer at UPS</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="media">
+                                            <a class="pull-left" onclick="return false;" href="#">
+                                                <img class="media-object img-circle" src="../img/unknow-user.jpg" alt="">
+                                            </a>
+                                            <div class="media-body">
+                                                <h4 class="media-heading">
+                                                    <strong>Ángel Vélez Mero</strong>
+                                                </h4>
+                                                <p>UPS Coordinator</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

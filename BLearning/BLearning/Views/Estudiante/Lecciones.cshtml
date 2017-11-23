@@ -1,0 +1,155 @@
+﻿@model List<BLearning.Models.Negocio.LeccionEntidad>
+@using System.Collections.Generic
+@using BLearning.Models.Negocio
+@{
+    ViewBag.Title = "Lessons";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    LogicEncriptacionMetodos _objEnc = new LogicEncriptacionMetodos();
+}
+
+@Styles.Render("~/Content/timeline.css")
+
+<!-- begin PAGE TITLE AREA -->
+<!-- Use this section for each page's title and breadcrumb layout. In this example a date range picker is included within the breadcrumb. -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="page-title">
+            <h1>
+                Content
+                <small> - Lessons level @ViewBag.Nivel</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li class="active"><i class="fa fa-dashboard"></i> Tasks</li>
+                <li class="pull-right">
+                    <a href="#" onclick="history.back()" class="btn btn-red btn-square date-picker"><i class="fa fa-chevron-circle-left"><span> Back</span></i></a>
+                </li>
+            </ol>
+        </div>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<!--begin activities. En estaa seccion se muestran los tipos de actividades de forma agrupada-->
+
+<div class="row">
+    <div class="col-lg-8 left">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="portlet portlet-default">
+                    <div class="portlet-heading">
+                        <div class="portlet-title ">
+                            <h4><i class="fa fa-briefcase text-yellow fa-lg"></i> List of lessons</h4>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div id="timeline">
+                        <div class="demo-card-wrapper">
+                            @{
+                                var contador = 0;
+                                var numLecc = 0;
+                                List<LeccionesXcompletarEntidad> numeroLeciones = (List<LeccionesXcompletarEntidad>)ViewData["numLecciones"];
+                                LeccionesXcompletarEntidad noResueltas = new LeccionesXcompletarEntidad();
+                                foreach (var item in Model)
+                                {
+                                    contador++;
+                                    numLecc++;
+                                    if (numeroLeciones.Count() != 0)
+                                    {
+                                        noResueltas = numeroLeciones.Find(c => c.idLeccion == item.idLeccion);
+                                    }
+                                    
+                                    var temp = '0';
+                                        var numTem = temp + "" + numLecc;
+                                        <a class="demo-card demo-card--step-1 btn-default" href="@Url.Action("Actividades", "Estudiante", new { @area="", idLeccionEn = _objEnc.Encrypt(item.idLeccion.ToString()), n = _objEnc.Encrypt(item.numLeccion)})">
+                                            <div class="head">
+                                                <div class="number-box">
+                                                    <span> @numTem</span>
+
+                                                </div>
+                                                <h2><i>Lesson</i></h2>
+                                                @if (noResueltas != null && noResueltas.numActividades != 0)
+                                                {
+                                                    <span class="badge bg-yellow" style="margin-left:10px">@noResueltas.numActividades</span>
+
+                                                }
+                                            </div>
+                                        </a>
+
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+                
+
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 right">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="portlet portlet-default">
+                    <div class="portlet-heading">
+                        <div class="portlet-title ">
+                            <h4><i class="fa fa-certificate text-yellow fa-lg"></i> Progress</h4>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="portlet-body" style="overflow: hidden; width: auto;">
+
+                        <div class="row">
+                            @{
+                                if (ViewData["puntos"] == null)
+                                {
+                                    <div class="col-lg-12">
+                                        <br />
+                                        <br />
+                                        <br />
+                                        <p class="text-center text-muted">Not enough data to display progress</p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    var calificacion = (decimal)ViewData["puntos"];
+                                    <div class="col-xs-12 text-center" >
+                                        <img class="img-responsive" id="img-cali-star" style="height: 150px; margin:auto" src="" alt="Alternate Text" />
+                                    </div>
+                                    <div class="col-xs-12">
+                                        <div style="text-align:center">
+                                            <h4 id="mens1"></h4>
+                                            <h5 id="mens2"></h5>
+                                        </div>
+                                        <div class="caja-puntos">
+                                            <div class="texto">
+                                                <div class="box-numero text-center">
+                                                    <span id="calif" data-valor="@calificacion">@calificacion</span>
+                                                    <h5>SCORE</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                    </div>
+                    @if (ViewData["puntos"] != null)
+                    {
+                        <div class="portlet-footer">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <a href="@Url.Action("Estadistica", "Estudiante", new  { @area= "" })" class="btn btn-orange pull-right">View statistics</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/Scripts/estado-calificacion.js")
+<script>
+    agregarMensaje();
+</script>
+
